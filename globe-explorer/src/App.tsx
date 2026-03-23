@@ -1,5 +1,6 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {GlobeCanvas} from './components/GlobeCanvas.tsx';
+import {CountryInfo} from './components/CountryInfo.tsx';
 import {useCountries} from './hooks/useCountries.ts';
 
 const queryClient = new QueryClient();
@@ -8,8 +9,10 @@ function GlobeApp() {
   const {data: countries} = useCountries();
 
   return (
-    <div className="h-full w-full bg-slate-900">
-      <GlobeCanvas countries={countries} />
+    <div className="relative h-full w-full bg-slate-900">
+      <GlobeCanvas countries={countries}>
+        <CountryInfo />
+      </GlobeCanvas>
     </div>
   );
 }

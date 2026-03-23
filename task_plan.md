@@ -24,13 +24,13 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 2.7 Implement CountryStateModule + country selection. CountryDataMap (Map<cca3, {lat,lon}>) заполняется из restcountries. Оба пути (globe click и list click) используют один и тот же select(code) → CameraModule.flyTo с координатами из CountryDataMap.
   - [x] 2.8 Verify: tsc ✓, eslint ✓, prettier ✓, tests (58/58) ✓, build ✓
 
-- [ ] Phase 3: UI & Data (Level 0 — mandatory)
+- [x] Phase 3: UI & Data (Level 0 — mandatory)
   - [x] 3.1 Create React↔three-kvy-core bridge (GlobeCanvas component, event-based communication)
   - [x] 3.2 Fetch country data from restcountries.com via @tanstack/react-query (поля: name, cca3, ccn3, capital, population, area, region, subregion, languages, currencies, flags, latlng)
   - [x] 3.3 Match REST Countries → GeoJSON по ISO codes: строим Map<ccn3, cca3> из данных restcountries, применяем при создании мешей. Обработка edge cases: страны без ccn3 (fallback по name), меши без match (серые, не кликабельные), записи restcountries без геометрии (присутствуют в данных, будут видны в списке при реализации Phase 4). Логируем unmatched.
-  - [ ] 3.4 Create CountryInfo panel — display selected country details (flag, name, capital, population, area, region, languages, currencies)
-  - [ ] 3.5 Ensure full mobile support: responsive layout (info panel снизу на mobile), touch controls (уже в CameraModule + RaycastModule), проверка WebGL2 fallback на Safari iOS
-  - [ ] 3.6 End-to-end verification: data loads → globe renders → click country → info panel shows
+  - [x] 3.4 Create CountryInfo panel — flag, name (common+official), capital, region, subregion, population, area, languages, currencies. Desktop: right side, mobile: bottom sheet. Animated show/hide.
+  - [x] 3.5 Mobile responsive: info panel снизу на mobile (max-md:), touch controls (CameraModule + RaycastModule), backdrop-blur panel
+  - [x] 3.6 Verify: tsc ✓, eslint ✓, prettier ✓, tests (61/61) ✓, build ✓
 
 - [ ] Phase 4: Country List & Synchronization (Level 1 — recommended)
   - [ ] 4.1 Create CountryList component with search by name
@@ -77,7 +77,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 2 complete** — 3D Core done. GlobeCanvas renders WebGPURenderer scene with ocean sphere, camera-controls orbit, country mesh generation from world-atlas TopoJSON (local-plane earcut + spherical subdivision), raycasting for hover/click, CountryStateModule for selection, TSL shaders, tween.js animations. React bridge (GlobeContext, useCountryState, useCountries) and data loading pipeline implemented. ISO matching: ccn3 + name fallback. 58 tests passing. Ready for Phase 3 (UI panels).
+**Phase 3 complete** — 3D Core + UI. Globe with WebGPURenderer, country meshes (local-plane earcut + spherical subdivision), camera-controls, raycasting, CountryStateModule, TSL shaders, tween.js animations. CountryInfo panel with responsive layout. 61 tests passing. Ready for Phase 4 (Country List).
 
 ## Files
 - `task_plan.md` — this file

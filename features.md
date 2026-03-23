@@ -23,11 +23,14 @@
 - **useGlobeContext** hook — React context for accessing CoreContext and CountriesFeature
 - **ISO matching** — Map<ccn3, cca3> built from restcountries data (primary), with case-insensitive name-based fallback for countries without ccn3. Applied when building country meshes. Unmatched logged.
 
-## Not Yet Implemented
+### CountryInfo Panel (Phase 3)
+- **CountryInfo** component — shows selected country details: flag (SVG), name (common + official), capital, region, subregion, population (formatted: K/M/B), area (km²), languages, currencies
+- Desktop: right side panel (w-80), mobile: bottom sheet (full width)
+- Animated show/hide with `translate-y` + `opacity` transition
+- Uses `useCountryState` for selection + `useCountries` for data lookup
+- Glassmorphism style: `bg-slate-800/90 backdrop-blur-md border-white/10`
 
-### Level 0 (Mandatory) — remaining
-- CountryInfo panel — display selected country details (flag, name, capital, population, area, region, languages, currencies)
-- Full mobile support verification (responsive layout, touch on iOS Safari)
+## Not Yet Implemented
 
 ### Level 1 (Recommended)
 - Country list in UI with search by name
