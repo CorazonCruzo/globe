@@ -5,14 +5,14 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 
 ## Phases
 
-- [ ] Phase 1: Project Setup
-  - [ ] 1.1 Initialize Vite + React 19.2 + TypeScript project
-  - [ ] 1.2 Install and configure Three.js r183, three-kvy-core, camera-controls, tween.js, eventemitter3
-  - [ ] 1.3 Configure ESLint (@tanstack/eslint-config) + Prettier (@shopify/prettier-config)
-  - [ ] 1.4 Configure Tailwind CSS v4 + clsx + tailwind-merge
-  - [ ] 1.5 Install @base-ui/react, @tanstack/react-query
-  - [ ] 1.6 Install world-atlas + topojson-client for GeoJSON data
-  - [ ] 1.7 Verify build works, all configs valid
+- [x] Phase 1: Project Setup
+  - [x] 1.1 Initialize Vite 6 + React 19.2.4 + TypeScript project (Vite 8 incompatible with Node 20.17.0)
+  - [x] 1.2 Install Three.js r183, three-kvy-core, camera-controls, tween.js, eventemitter3 (--legacy-peer-deps для совместимости)
+  - [x] 1.3 Configure ESLint (@tanstack/eslint-config with projectService override) + Prettier (@shopify/prettier-config)
+  - [x] 1.4 Configure Tailwind CSS v4 (@tailwindcss/vite plugin) + clsx + tailwind-merge
+  - [x] 1.5 Install @base-ui/react, @tanstack/react-query
+  - [x] 1.6 Install world-atlas, topojson-client, earcut + types
+  - [x] 1.7 Verify: tsc ✓, eslint ✓, vite build ✓
 
 - [ ] Phase 2: 3D Core (Level 0 — mandatory)
   - [ ] 2.1 Create CoreContext with WebGPURenderer (await renderer.init() для WebGPU/WebGL2 fallback), PerspectiveCamera, Scene. GlobeCanvas показывает loading пока init не завершён. Логировать фактический бэкенд.
@@ -75,7 +75,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Полигоны, пересекающие ±180°, разрезаются на две части.
 
 ## Status
-**Phase 0** — Planning complete, ready to start Phase 1
+**Phase 1 complete** — Project setup done. Ready to start Phase 2 (3D Core).
 
 ## Files
 - `task_plan.md` — this file

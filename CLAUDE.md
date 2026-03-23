@@ -17,6 +17,16 @@ Interactive 3D globe for exploring countries of the world. Built with React 19.2
 - Minimize imperative code in React components
 - Use base-ui components wherever possible
 
+## Testing Rules
+
+- Write tests for every new module, feature, utility, and component
+- Tests must pass before considering a task complete
+- Run the full test suite after each change to ensure no regressions
+- Use Vitest as the test runner (compatible with Vite)
+- For Three.js/3D logic: unit-test pure functions (geo projection, triangulation, ISO mapping), mock Three.js objects where needed
+- For React components: use @testing-library/react
+- For modules/features (three-kvy-core): test lifecycle, events, state transitions
+
 ## Verification Commands
 
 ```bash
@@ -26,14 +36,17 @@ npx tsc --noEmit
 # Lint
 npx eslint .
 
+# Format check
+npx prettier --check .
+
+# Tests
+npm run test
+
 # Build
 npm run build
-
-# Dev server
-npm run dev
 ```
 
-**IMPORTANT:** Always run verification after code changes. Do not skip this step.
+**IMPORTANT:** Always run ALL verification commands after code changes. All must pass (tsc, eslint, prettier, tests, build). Do not skip any step. Run `npx prettier --write .` to fix formatting issues.
 
 ## Planning Files
 
