@@ -32,5 +32,5 @@ npm run preview    # Preview production build
 - Vite 6, TypeScript, React 19.2+
 - Three.js r183 + WebGPURenderer, three-kvy-core
 - Tailwind CSS v4, @base-ui/react
-- @tanstack/react-query
+- @tanstack/react-query, @tanstack/react-table, @tanstack/react-virtual
 - Vitest, Testing Library

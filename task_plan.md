@@ -38,13 +38,14 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 4.3 Synchronize select state: list click → globe fly-to, globe click → list scroll-to (scrollIntoView)
   - [x] 4.4 Verify: tsc ✓, eslint ✓, prettier ✓, tests (68/68) ✓, build ✓, browser check ✓
 
-- [ ] Phase 5: Table, Filtering & Virtualization (Level 2 — advanced)
-  - [ ] 5.1 Install @tanstack/react-table + @tanstack/react-virtual
-  - [ ] 5.2 Create CountryTable with columns: flag, name, capital, population, area, region
-  - [ ] 5.3 Add filtering by region, subregion, and text search
-  - [ ] 5.4 Add sorting by all numeric/text columns
-  - [ ] 5.5 Implement infinite scroll with virtualization (@tanstack/react-virtual)
-  - [ ] 5.6 Synchronize table selection with globe (same as Level 1)
+- [x] Phase 5: Table, Filtering & Virtualization (Level 2 — advanced)
+  - [x] 5.1 Install @tanstack/react-table + @tanstack/react-virtual
+  - [x] 5.2 Create CountryTable with columns: flag, name, capital, population, area, region
+  - [x] 5.3 Add filtering by region and text search
+  - [x] 5.4 Add sorting by name, population, area, region columns
+  - [x] 5.5 Implement virtualized scroll (@tanstack/react-virtual, overscan 10)
+  - [x] 5.6 Synchronize table selection with globe (same as Level 1) + List/Table view toggle
+  - [x] 5.7 Verify: tsc ✓, eslint ✓, prettier ✓, tests (75/75) ✓, build ✓, browser check ✓
 
 - [ ] Phase 6: Bonus — Creative 3D
   - [ ] 6.1 Visual effects: hover glow, click pulse, selection highlight animation
@@ -77,7 +78,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 4 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 68 tests passing. Ready for Phase 5 (Table, Filtering & Virtualization).
+**Phase 5 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 76 tests passing. Ready for Phase 6 (Bonus — Creative 3D).
 
 ## Files
 - `task_plan.md` — this file

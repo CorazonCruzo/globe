@@ -38,11 +38,15 @@
 - Responsive: desktop left sidebar (w-64), mobile bottom panel
 - Memoized items (`memo` + `forwardRef`) for performance with 250 countries
 
-## Not Yet Implemented
+### CountryTable (Phase 5)
+- **CountryTable** component — @tanstack/react-table with columns: flag, name, capital, population, area, region
+- **Filtering**: text search + region dropdown (All/Africa/Americas/Antarctic/Asia/Europe/Oceania)
+- **Sorting**: clickable column headers, ascending/descending toggle (name, population, area, region)
+- **Virtualization**: @tanstack/react-virtual with overscan 10, row height 36px
+- **Sync**: same as CountryList — hover/select bidirectional with globe, search clears on external select
+- **View toggle**: List/Table switch button at bottom center
 
-### Level 2 (Advanced)
-- Filtering and sorting via @tanstack/react-table
-- Infinite scroll with virtualization via @tanstack/react-virtual
+## Not Yet Implemented
 
 ### Bonus
 - Visual effects on hover, click, and selection

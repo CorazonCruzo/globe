@@ -20,6 +20,7 @@ export function CountryList() {
   const [search, setSearch] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const internalSelectRef = useRef(false);
 
   const sorted = useMemo(() => {
     if (!countries) return [];
@@ -34,10 +35,13 @@ export function CountryList() {
     return sorted.filter((c) => c.name.common.toLowerCase().includes(q));
   }, [sorted, search]);
 
-  // Scroll to selected country when globe click triggers selection.
-  // Clear search so the selected country is visible in the list.
+  // Clear search only on external select (globe click), not internal list click
   useEffect(() => {
     if (!selectedCode) return;
+    if (internalSelectRef.current) {
+      internalSelectRef.current = false;
+      return;
+    }
     setSearch('');
   }, [selectedCode]);
 
@@ -53,6 +57,7 @@ export function CountryList() {
   const handleSelect = useCallback(
     (code: string) => {
       if (!globe) return;
+      internalSelectRef.current = true;
       globe.ctx.modules.countryState.select(code);
     },
     [globe],
