@@ -1,0 +1,115 @@
+Frontend Developer
+
+Technical Assessment
+Build a mini web application using React and Three.js — an interactive
+3D globe for exploring countries of the world and related functionality.
+
+■ 48-hour deadline
+
+TASKS BY LEVEL
+
+LEVEL 0
+
+Core Functionality
+
+● REQUIRED
+
+Mandatory — must be completed in full
+
+— 3D scene with a globe
+— Camera navigation in 3D space
+— Country visualization on the globe
+— Interactivity: click to select a country
+— Display detailed information about the selected country
+— Country data loaded dynamically from the public API restcountries.com
+— All Three.js logic implemented within the three-kvy-core library
+— Full mobile support
+
+LEVEL 1
+
+Country List & Synchronization
+Recommended
+
+— Country list in the UI with search by name
+— Synchronized hover / select state between the list and the globe
+
+LEVEL 2
+
+Table, Filtering & Virtualization
+Advanced
+
+— Filtering and sorting the country list by various parameters, rendered as a table using
+@tanstack/react-table
+
+— Infinite scroll with virtualization (powered by @tanstack/*)
+
+BONUS
+
+Creative 3D Level
+Extra credit
+
+— Visual effects on hover, click and country selection
+— Globe appearance customization using shaders or other tools/approaches
+— Light / dark theme toggle
+
+Note on prioritization. The approach to country visualization on the globe is intentionally left open —
+different implementations imply different levels of complexity and 3D expertise. If you feel confident in
+certain areas or see more creative potential in specific tasks, prioritize accordingly. The full Level 0 task pool
+is mandatory. Additional creative contributions are always welcome.
+
+TECHNICAL REQUIREMENTS
+
+PROJECT SETUP
+
+THREE.JS
+
+· Vite
+
+· Three.js r183 + WebGPURenderer
+
+· TypeScript
+
+· All 3D logic via three-kvy-core
+
+· React 19.2+
+
+· Shaders — TSL
+
+· ESLint — @tanstack/eslint-config
+
+· Animations — tween.js
+
+· Prettier — config from web-configs
+
+· Camera navigation — camera-controls
+
+· npm ≥ 10.2.4, node ≥ 20.11.0
+
+DATA & STATE
+
+UI & STYLING
+
+· Requests & caching —
+
+· Styles — Tailwind CSS v4
+
+@tanstack/react-query
+
+· Any state manager is allowed; minimize global
+stores
+· Prefer binding state to specific entities / class
+instances
+
+· Utilities — clsx + tailwind-merge
+· Use base-ui components wherever possible
+· Avoid props drilling
+· Minimize imperative code in React components
+
+· Events (if needed) — eventemitter3
+
+SUBMISSION
+
+GitHub Repository Public repository with full source code
+Live Demo Link to a deployed, working version of the application
+
+
