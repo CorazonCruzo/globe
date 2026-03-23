@@ -7,16 +7,14 @@
 - **Ocean sphere** via `GlobeFeature` — SphereGeometry(R=5, 64 segments) + MeshStandardNodeMaterial with TSL ocean shader (deep/shallow/pole color blend based on normalWorld.y)
 - **Camera orbit** via `CameraModule` — camera-controls wrapper. Touch: 1 finger rotate, 2 fingers dolly. Truck disabled. `flyTo(lat, lon)` animates to country coordinates.
 - **Geo pipeline** (`geoProjection.ts`, `triangulate.ts`):
-  - `lonLatToVec3(lon, lat, radius)` — spherical projection (Y-up, lon=0 → +Z)
-  - `subdivideEdge` — great circle arc subdivision for edges >5°
-  - `crossesAntimeridian` / `splitRingAtAntimeridian` — antimeridian handling (holes are dropped for split polygons; no such case exists in 110m dataset)
-  - `processRing` — GeoJSON ring processing with edge subdivision
-  - `triangulatePolygon` — earcut triangulation with holes support, projected onto sphere
-- **Country meshes** via `CountriesFeature` — loads world-atlas 110m TopoJSON, builds per-country Mesh on radius R+0.001 (z-fighting offset). Uses ISO numeric→cca3 map from restcountries. Unmatched countries rendered grey, not clickable.
+  - `lonLatToVec3(lon, lat, radius)` — spherical projection (Y-up, lon=0 → +Z, lon>0 → +X)
+  - `processRing` — strips closing duplicate, removes non-finite and duplicate vertices
+  - `triangulatePolygon` — earcut in local 2D plane (not raw lon/lat) → spherical subdivision → winding normalization → spherical normals. Handles poles and antimeridian without special cases
+- **Country meshes** via `CountriesFeature` — loads world-atlas 110m TopoJSON, builds per-country Mesh on radius R+0.01. Uses ISO numeric→cca3 map from restcountries (+ name fallback). Unmatched countries rendered grey, not clickable.
 - **Raycasting** via `RaycastModule` — pointer events (mouse + touch unified), hover/click detection on country meshes
 - **Country state** via `CountryStateModule` — selected/hovered country state, events (select/deselect/hover/unhover). CountryDataMap stores lat/lon from restcountries for flyTo.
 - **Per-country visuals** via `CountryMeshFeature` — tween.js animated hover/select color transitions via TSL uniform nodes
-- **Country shaders** (`countryShader.ts`) — MeshStandardNodeMaterial with uniform-driven hover/select color blend (green → light green on hover, → gold on select)
+- **Country shaders** (`countryShader.ts`) — MeshStandardNodeMaterial with polygonOffset for z-fighting, uniform-driven hover/select color blend (green → light green on hover, → gold on select)
 
 ### React Bridge (Phase 2/3)
 - **GlobeCanvas** component — mounts CoreContext, shows loading state during WebGPU init, provides GlobeContext to children

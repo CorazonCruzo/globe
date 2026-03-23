@@ -72,9 +72,14 @@ export function triangulatePolygon(
   }
 
   const geometry = new BufferGeometry();
-  geometry.setAttribute('position', new Float32BufferAttribute(flatPositions, 3));
+  geometry.setAttribute(
+    'position',
+    new Float32BufferAttribute(flatPositions, 3),
+  );
   geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-  geometry.setIndex(new Uint32BufferAttribute(new Uint32Array(refined.indices), 1));
+  geometry.setIndex(
+    new Uint32BufferAttribute(new Uint32Array(refined.indices), 1),
+  );
 
   return geometry;
 }
@@ -95,9 +100,7 @@ function appendRing(
 function createLocalBasis(vertices: Array<Vec3>) {
   const center = normalizeVec3(sumVec3(vertices));
   const reference =
-    Math.abs(center.y) > 0.9
-      ? {x: 1, y: 0, z: 0}
-      : {x: 0, y: 1, z: 0};
+    Math.abs(center.y) > 0.9 ? {x: 1, y: 0, z: 0} : {x: 0, y: 1, z: 0};
 
   const xAxis = normalizeVec3(crossVec3(reference, center));
   const yAxis = normalizeVec3(crossVec3(center, xAxis));
@@ -160,7 +163,9 @@ function subdivideMesh(
       let b = indices[i + 1];
       let c = indices[i + 2];
 
-      if (getTriangleOrientation(positions[a], positions[b], positions[c]) < 0) {
+      if (
+        getTriangleOrientation(positions[a], positions[b], positions[c]) < 0
+      ) {
         [b, c] = [c, b];
       }
 
@@ -168,20 +173,7 @@ function subdivideMesh(
       const bc = getMidpointIndex(positions, midpointCache, b, c, radius);
       const ca = getMidpointIndex(positions, midpointCache, c, a, radius);
 
-      nextIndices.push(
-        a,
-        ab,
-        ca,
-        ab,
-        b,
-        bc,
-        ca,
-        bc,
-        c,
-        ab,
-        bc,
-        ca,
-      );
+      nextIndices.push(a, ab, ca, ab, b, bc, ca, bc, c, ab, bc, ca);
     }
 
     indices = nextIndices;

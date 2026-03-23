@@ -1,7 +1,7 @@
 # Architecture: Globe Explorer
 
 ## Overview
-A single-page React application with an embedded Three.js 3D globe scene. The 3D logic lives entirely in `three-kvy-core` classes (features/modules). React handles UI panels, data fetching, and state. Communication between React and 3D uses eventemitter3 events.
+A single-page React application with an embedded Three.js 3D globe scene. The 3D logic lives entirely in `three-kvy-core` classes (features/modules). React handles data fetching and state. Communication between React and 3D uses eventemitter3 events. UI panels (CountryInfo, list, table) are planned for Phase 3–5.
 
 ## WebGPU / Mobile Compatibility Strategy
 
@@ -11,13 +11,12 @@ WebGPURenderer имеет **встроенный автоматический fa
 1. `createGlobeContext` создаёт `new WebGPURenderer({ antialias: true })`
 2. Вызывает `await renderer.init()` — в этот момент происходит проверка WebGPU и возможный fallback
 3. Только после успешного init создаётся CoreContext и вызывается `ctx.run()`
-4. GlobeCanvas показывает loading-состояние, пока init не завершился
+4. GlobeCanvas показывает loading-состояние, пока init не завершился. При ошибке — показывает error state.
 
 **Touch-устройства:**
 - `camera-controls` использует Pointer Events — работает одинаково для mouse и touch без дополнительной настройки
 - Конфигурация touch-жестов: one finger = rotate, two fingers = dolly (pinch zoom), truck отключён (не нужен для глобуса)
 - `RaycastModule` использует pointer events (pointerdown/pointermove) — единый код для mouse и touch
-- Layout: на мобильных CountryInfo панель перекрывает снизу, а не сбоку
 
 **Проверка:**
 - Chrome/Edge desktop: WebGPU native
@@ -28,7 +27,7 @@ WebGPURenderer имеет **встроенный автоматический fa
 
 **Ограничение:** TSL-код компилируется в WGSL (WebGPU) или GLSL ES 3.0 (WebGL2) автоматически. Единственное, что НЕ переносимо — `wgslFn()` (raw WGSL). Мы его не используем, только TSL nodes.
 
-## File Structure
+## File Structure (current state)
 ```
 globe-explorer/
 ├── index.html
@@ -36,15 +35,14 @@ globe-explorer/
 ├── tsconfig.json
 ├── eslint.config.js
 ├── package.json
-├── public/
-│   └── textures/              # Globe textures (if needed)
 ├── src/
 │   ├── main.tsx               # React entry point
-│   ├── App.tsx                # Root layout: globe + UI panels
+│   ├── App.tsx                # Root layout: QueryClientProvider + GlobeCanvas
 │   ├── index.css              # Tailwind CSS v4 entry (@import "tailwindcss")
 │   │
 │   ├── three/                 # All Three.js logic via three-kvy-core
 │   │   ├── createGlobeContext.ts  # Factory: CoreContext + WebGPURenderer + camera + scene + modules
+│   │   ├── types.ts               # GlobeModules interface
 │   │   ├── modules/
 │   │   │   ├── CameraModule.ts        # CoreContextModule — camera-controls wrapper
 │   │   │   ├── TweenModule.ts         # CoreContextModule — tween.js Group, updated per frame
@@ -52,38 +50,32 @@ globe-explorer/
 │   │   │   └── CountryStateModule.ts  # CoreContextModule — selected/hovered country state + events
 │   │   ├── features/
 │   │   │   ├── GlobeFeature.ts        # Object3DFeature — sphere mesh with ocean TSL shader
-│   │   │   ├── CountriesFeature.ts    # Object3DFeature — loads GeoJSON, creates country meshes
-│   │   │   ├── CountryMeshFeature.ts  # Object3DFeature — per-country: hover/select visual state
-│   │   │   └── AtmosphereFeature.ts   # Object3DFeature — (Bonus) atmosphere glow effect
+│   │   │   ├── CountriesFeature.ts    # Object3DFeature — loads TopoJSON, creates country meshes
+│   │   │   └── CountryMeshFeature.ts  # Object3DFeature — per-country: hover/select visual state
 │   │   ├── shaders/
 │   │   │   ├── oceanShader.ts         # TSL: ocean surface shader
-│   │   │   ├── countryShader.ts       # TSL: country mesh shader (base + hover + select states)
-│   │   │   └── atmosphereShader.ts    # TSL: (Bonus) atmosphere glow
+│   │   │   └── countryShader.ts       # TSL: country mesh shader (base + hover + select states)
 │   │   └── utils/
-│   │       ├── geoProjection.ts       # lon/lat → Vec3 on sphere, GeoJSON → BufferGeometry
-│   │       ├── triangulate.ts         # Earcut wrapper for polygon triangulation
-│   │       └── isoCodeMap.ts          # ISO numeric → alpha-3 mapping for world-atlas ↔ restcountries
+│   │       ├── geoProjection.ts       # lon/lat → Vec3 on sphere, ring processing
+│   │       └── triangulate.ts         # Local-plane earcut + spherical subdivision
 │   │
 │   ├── components/
-│   │   ├── GlobeCanvas.tsx        # Mounts CoreContext to a <div>, manages lifecycle
-│   │   ├── CountryInfo.tsx        # Selected country details panel
-│   │   ├── CountryList.tsx        # Level 1: searchable country list
-│   │   ├── CountryTable.tsx       # Level 2: @tanstack/react-table + virtual scroll
-│   │   ├── SearchInput.tsx        # Search input using base-ui
-│   │   ├── ThemeToggle.tsx        # Bonus: light/dark theme toggle
-│   │   └── ui/                    # Shared UI primitives (base-ui wrappers)
-│   │       └── cn.ts              # clsx + tailwind-merge utility
+│   │   └── GlobeCanvas.tsx        # Mounts CoreContext to a <div>, manages lifecycle
 │   │
 │   ├── hooks/
-│   │   ├── useCountries.ts        # react-query: fetch from restcountries.com
+│   │   ├── useCountries.ts        # react-query: fetch from restcountries.com (two batches)
 │   │   ├── useGlobeContext.ts     # React context + hook for accessing CoreContext
-│   │   └── useCountryState.ts    # Subscribe to CountryStateModule events from React
+│   │   └── useCountryState.ts     # Subscribe to CountryStateModule events from React
 │   │
 │   ├── types/
-│   │   └── country.ts            # TypeScript interfaces: Country, GeoFeature, etc.
+│   │   └── country.ts            # TypeScript interfaces: Country, CountryDataEntry
 │   │
-│   └── lib/
-│       └── constants.ts          # Globe radius, API URLs, etc.
+│   ├── lib/
+│   │   ├── constants.ts          # Globe radius, API URLs, camera params
+│   │   └── cn.ts                 # clsx + tailwind-merge utility
+│   │
+│   └── test/
+│       └── setup.ts              # Vitest setup (@testing-library/jest-dom)
 ```
 
 ## Modules
@@ -93,63 +85,66 @@ globe-explorer/
 - Creates: WebGPURenderer, PerspectiveCamera, Scene, Clock
 - Registers modules: CameraModule, TweenModule, RaycastModule, CountryStateModule
 - Creates globe Object3D with GlobeFeature + CountriesFeature attached
-- Returns: CoreContext instance
+- Returns: CoreContext instance + CountriesFeature ref
 
 ### three/modules/CameraModule.ts (CoreContextModule)
 - Purpose: Wraps camera-controls for orbit navigation
 - Configures: distance limits, polar angle limits, smooth transitions, touch support
 - Exposes: `flyTo(lat, lon)` method for programmatic navigation
-- Updates camera-controls in render loop via `useCtx`
+- Deferred init: creates controls on `mount` event (not in `useCtx`, since container may not exist yet)
 - Touch config: one finger = rotate, two fingers = dolly, truck отключён
 
 **Канонический источник координат для flyTo:**
 - `flyTo(lat, lon)` принимает географические координаты (широта, долгота в градусах)
-- Внутри конвертирует в azimuth/polar для camera-controls: `azimuth = -lon * DEG2RAD`, `polar = (90 - lat) * DEG2RAD`
+- Внутри конвертирует в azimuth/polar для camera-controls: `azimuth = lon * DEG2RAD`, `polar = (90 - lat) * DEG2RAD`
 - Вызывает `controls.normalizeRotations()` перед каждым `rotateTo` (требование camera-controls v3 для кратчайшего пути)
 - Координаты берутся из **единственного источника**: поле `latlng` из данных restcountries.com, закешированных в react-query
 
 **Откуда приходит lat/lon в каждом сценарии:**
-1. **Клик по мешу на глобусе** → RaycastModule определяет countryCode из `mesh.userData.countryCode` → CountryStateModule.select(code) → CameraModule получает lat/lon из CountryDataMap (Map<code, {lat, lon}>, заполняется при загрузке данных restcountries)
-2. **Клик по элементу списка/таблицы** → React вызывает CountryStateModule.select(code) → тот же путь: CameraModule берёт координаты из CountryDataMap
-3. **CountryDataMap** — Map<string, {lat, lon}>, хранится в CountryStateModule, заполняется один раз при загрузке данных из restcountries.com. Это единственное место, где хранятся координаты для навигации.
+1. **Клик по мешу на глобусе** → RaycastModule определяет countryCode из `mesh.userData.countryCode` → CountryStateModule.select(code) → CameraModule получает lat/lon из CountryDataMap
+2. **Клик по элементу списка/таблицы** → React вызывает CountryStateModule.select(code) → тот же путь
+3. **CountryDataMap** — Map<string, {lat, lon}>, хранится в CountryStateModule, заполняется при загрузке данных из restcountries.com
 
 ### three/modules/TweenModule.ts (CoreContextModule)
 - Purpose: Manages tween.js Group, calls `group.update()` each frame
-- Used by features for any animations (hover glow, selection pulse, fly-to)
+- Used by features for any animations (hover glow, selection pulse)
 
 ### three/modules/RaycastModule.ts (CoreContextModule)
 - Purpose: Handles pointer events → raycasting against country meshes
-- Emits: `hover(countryCode)`, `unhover()`, `click(countryCode)` events
-- Handles both mouse and touch
+- Deferred init: attaches listeners on `mount` event
+- Distinguishes click vs drag (5px threshold)
 
 ### three/modules/CountryStateModule.ts (CoreContextModule)
 - Purpose: Single source of truth for selected/hovered country
 - State: `selectedCode: string | null`, `hoveredCode: string | null`
 - Emits: `select`, `deselect`, `hover`, `unhover` events
-- React subscribes to these events via useCountryState hook
+- Re-click same country = deselect (toggle behavior)
+- On select: triggers CameraModule.flyTo via CountryDataMap coordinates
 
 ### three/features/GlobeFeature.ts (Object3DFeature)
 - Purpose: Creates the base sphere mesh (ocean)
 - Material: MeshStandardNodeMaterial with TSL ocean shader
-- Radius: defined in constants
+- Radius: GLOBE_RADIUS (5)
 
 ### three/features/CountriesFeature.ts (Object3DFeature)
 - Purpose: Loads world-atlas TopoJSON, converts to GeoJSON, creates country meshes
 - Each country = separate Mesh with CountryMeshFeature attached
 - Stores meshes in Map<countryCode, Mesh> for lookup
+- ISO matching: ccn3 primary + case-insensitive name fallback
 
 **Геометрический пайплайн:**
 1. Загрузка `countries-110m.json` из world-atlas (TopoJSON)
 2. Конвертация в GeoJSON через `topojson-client: feature(topology, topology.objects.countries)`
 3. Для каждого GeoJSON feature:
-   - **MultiPolygon**: обрабатывается как массив отдельных Polygon. Каждый polygon = отдельная геометрия, все объединяются в один BufferGeometry через `mergeGeometries`
-   - **Polygon с дырами (holes)**: внешнее кольцо (coordinates[0]) = контур, остальные кольца (coordinates[1..n]) = дыры. Передаются в earcut как holes для корректной триангуляции (пример: South Africa с Lesotho внутри)
-   - **Антимеридиан (±180°)**: для полигонов, пересекающих антимеридиан (например, Россия, Фиджи), проверяем разницу долгот соседних вершин. Если > 180°, разрезаем полигон на две части по антимеридиану. **Ограничение:** при разрезке holes отбрасываются; в датасете 110m нет полигонов с одновременным пересечением антимеридиана и дырами
-   - **Subdivision**: отключён перед earcut-триангуляцией — great-circle промежуточные точки создают самопересечения в 2D lon/lat плоскости. Для 110m данных плотность вершин достаточная
-4. Проекция 2D координат на сферу: `x = -R * cos(lat) * sin(lon)`, `y = R * sin(lat)`, `z = R * cos(lat) * cos(lon)`
-5. **Winding normalization**: после проекции на сферу нормали каждого треугольника проверяются на ориентацию (dot(cross(AB,AC), center)). Треугольники с инвертированным winding переворачиваются для корректного FrontSide culling
-6. **Rendering approach**: country meshes рендерятся как overlay поверх океана: `depthTest: false`, `depthWrite: false`, `renderOrder: 1`, `FrontSide`. Обратная сторона глобуса скрывается FrontSide culling (не depth test). **Ограничение**: 3D-объекты с renderOrder < 1 будут отображаться ЗА странами, даже если ближе к камере
-7. Нормали пересчитываются после проекции через `geometry.computeVertexNormals()`
+   - **MultiPolygon**: обрабатывается как массив отдельных Polygon, все объединяются через `mergeGeometries`
+   - **Polygon с дырами (holes)**: внешнее кольцо = контур, остальные = дыры. Передаются в earcut
+   - **Антимеридиан и полюса**: обрабатываются автоматически через локальную 2D-проекцию (не нужен специальный split)
+4. **Локальная 2D-проекция для earcut**: вершины сначала проецируются на сферу (`lonLatToVec3`), затем в локальную 2D-плоскость вокруг сферического центра полигона. Earcut работает в этой плоскости — корректно для полярных стран и антимеридиана
+5. Проекция координат на сферу: `x = R * cos(lat) * sin(lon)`, `y = R * sin(lat)`, `z = R * cos(lat) * cos(lon)` (Y-up, lon=0 → +Z, lon>0 → +X)
+6. **Spherical subdivision после earcut**: крупные плоские треугольники "проваливаются" внутрь сферы. Mesh subdivide'ится на сфере (глубина 2, для очень больших стран 3) с общими midpoint'ами по рёбрам. Все точки нормализуются на COUNTRY_RADIUS
+7. **Winding normalization**: после subdivision инвертированные треугольники переворачиваются для корректного FrontSide culling
+8. **Z-fighting**: `polygonOffset: true` с `polygonOffsetFactor: -1` на country materials. Стандартный depth test/write включены. FrontSide culling скрывает обратную сторону
+9. **Сферические нормали**: normal = normalize(position) для гладкого освещения
 
 ### three/features/CountryMeshFeature.ts (Object3DFeature)
 - Purpose: Per-country visual behavior
@@ -166,19 +161,19 @@ world-atlas TopoJSON → CountriesFeature → CountryMeshFeature[]
 User pointer events → RaycastModule → CountryStateModule → React + 3D Features
 ```
 
-### React → 3D direction:
+### React → 3D direction (planned for Phase 3+):
 1. User clicks country in list/table
 2. React calls `countryStateModule.select(code)`
 3. CountryStateModule emits "select" event
 4. CountryMeshFeature reacts: highlights mesh
 5. CameraModule.flyTo(lat, lon)
 
-### 3D → React direction:
+### 3D → React direction (currently working):
 1. User clicks country mesh on globe
 2. RaycastModule detects hit, calls `countryStateModule.select(code)`
 3. CountryStateModule emits "select" event
 4. useCountryState hook updates React state
-5. CountryInfo panel re-renders with new country
+5. (Phase 3: CountryInfo panel will re-render with new country)
 
 ## Key Design Decisions
 - **All 3D logic in three-kvy-core**: Zero Three.js code in React components (ТЗ requirement)
@@ -187,20 +182,22 @@ User pointer events → RaycastModule → CountryStateModule → React + 3D Feat
 - **Events via eventemitter3**: Already a dependency of three-kvy-core; used for 3D↔React bridge
 - **No props drilling**: React context for CoreContext + event subscriptions
 - **Minimal imperative React code**: useEffect only for mount/unmount; event subscription via custom hooks
-- **GeoJSON approach**: TopoJSON from world-atlas → triangulated meshes on sphere (our design choice)
-- **ISO code mapping**: world-atlas uses numeric ISO codes (feature.id, e.g. "840"), restcountries returns cca3 (alpha-3, e.g. "USA") — we build a lookup map
+- **Local-plane triangulation**: earcut в локальной 2D-плоскости вместо сырого lon/lat — единообразно обрабатывает антимеридиан и полюса
+- **Spherical subdivision**: post-earcut subdivision на сфере предотвращает "провалы" крупных треугольников внутрь сферы
+- **ISO code mapping**: world-atlas uses numeric ISO codes (feature.id), restcountries returns cca3 — мост через ccn3 + name fallback
 
 ## ISO Code Matching Strategy
 
-**Проблема:** world-atlas использует ISO 3166-1 numeric (feature.id), restcountries — cca2/cca3. Нужен мост.
+**Проблема:** world-atlas использует ISO 3166-1 numeric (feature.id), restcountries — cca3. Нужен мост.
 
 **Решение:**
 1. При загрузке данных restcountries.com запрашиваем поля `ccn3` (numeric) и `cca3` (alpha-3) для каждой страны
-2. Строим `Map<string, string>` — numeric → cca3 — из самих данных restcountries (поле `ccn3` → ключ, `cca3` → значение)
-3. При создании country-мешей в CountriesFeature записываем `mesh.userData.countryCode = cca3` (или null если не нашли)
+2. Строим `Map<string, string>` — numeric → cca3 — из данных restcountries (поле `ccn3`)
+3. Для стран без ccn3 — fallback по name (case-insensitive)
+4. При создании country-мешей записываем `mesh.userData.countryCode = cca3` (или null если не нашли)
 
 **Обработка несовпадений:**
-- **Страна есть в world-atlas, но нет в restcountries** (например, Антарктида, спорные территории): меш создаётся с `userData.countryCode = null`, рендерится серым цветом, не кликабельна, не отображается в списке
-- **Страна есть в restcountries, но нет в world-atlas** (например, микро-государства без полигонов в 110m): отображается в списке/таблице, но при клике из списка камера летит к координатам, подсветка меша не происходит
-- **ccn3 отсутствует у записи restcountries** (некоторые территории не имеют numeric кода): пытаемся fallback-матчинг по name, если не нашли — пропускаем
-- Логируем все unmatched записи в консоль при инициализации для отладки
+- **Страна есть в world-atlas, но нет в restcountries** (например, Антарктида, спорные территории): меш с `userData.countryCode = null`, серый цвет, не кликабельна
+- **Страна есть в restcountries, но нет в world-atlas** (микро-государства без полигонов в 110m): присутствует в данных, будет видна в списке/таблице (Phase 3+), нет highlight на глобусе
+- **ccn3 отсутствует**: fallback по name, если не нашли — пропускаем
+- Логируем все unmatched записи в консоль
