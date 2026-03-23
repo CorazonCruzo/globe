@@ -3,28 +3,19 @@ import {MeshBasicNodeMaterial} from 'three/webgpu';
 import {
   cameraPosition,
   float,
-  mix,
   normalize,
   positionWorld,
   pow,
-  smoothstep,
   uniform,
   vec4,
 } from 'three/tsl';
-import type {Color, Vector3} from 'three';
+import type {Color} from 'three';
 
-export interface AtmosphereMaterialOptions {
-  glowColor: Color;
-  warmColor: Color;
-  sunDirection: Vector3;
-  intensity: number;
-  rimPower: number;
-  daylightFloor: number;
-  sunHaloPower: number;
-  sunHaloStrength: number;
-}
-
-export function createAtmosphereMaterial(options: AtmosphereMaterialOptions) {
+/**
+ * Thin rim glow — a sharp Fresnel on a slightly larger BackSide sphere.
+ * Creates a subtle glowing edge around the globe silhouette.
+ */
+export function createRimGlowMaterial(glowColor: Color) {
   const material = new MeshBasicNodeMaterial({
     side: BackSide,
     transparent: true,
@@ -33,33 +24,18 @@ export function createAtmosphereMaterial(options: AtmosphereMaterialOptions) {
   });
   material.toneMapped = false;
 
-  const uGlowColor = uniform(options.glowColor);
-  const uWarmColor = uniform(options.warmColor);
-  const uSunDirection = uniform(options.sunDirection.clone().normalize());
-  const uIntensity = uniform(options.intensity);
-  const uRimPower = uniform(options.rimPower);
-  const uDaylightFloor = uniform(options.daylightFloor);
-  const uSunHaloPower = uniform(options.sunHaloPower);
-  const uSunHaloStrength = uniform(options.sunHaloStrength);
+  const uColor = uniform(glowColor);
+  const uPower = uniform(1.2);
+  const uIntensity = uniform(0.015);
 
   const viewDir = normalize(cameraPosition.sub(positionWorld));
   const normalDir = normalize(positionWorld);
-  const rimInput = float(1.0).sub(viewDir.dot(normalDir).abs()).clamp();
-  const rim = pow(rimInput, uRimPower);
-  const wideRim = pow(rimInput, float(2.4));
-  const sunAmount = normalDir.dot(normalize(uSunDirection)).clamp();
-  const daylight = mix(
-    uDaylightFloor,
-    float(1.0),
-    smoothstep(float(0.02), float(0.55), sunAmount),
+  const fresnel = pow(
+    float(1.0).sub(viewDir.dot(normalDir).abs()).clamp(0, 1),
+    uPower,
   );
-  const sunHalo = pow(sunAmount, uSunHaloPower)
-    .mul(wideRim)
-    .mul(uSunHaloStrength);
-  const alpha = rim.mul(uIntensity).mul(daylight).add(sunHalo).clamp(0.0, 1.0);
-  const tint = mix(uGlowColor, uWarmColor, sunHalo.clamp());
 
-  material.colorNode = vec4(tint, alpha);
+  material.colorNode = vec4(uColor, fresnel.mul(uIntensity));
 
-  return {material};
+  return {material, uColor, uPower, uIntensity};
 }

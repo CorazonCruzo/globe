@@ -10,13 +10,21 @@ import {
 import {useCountries} from '../hooks/useCountries.ts';
 import {useCountryState} from '../hooks/useCountryState.ts';
 import {useGlobeContext} from '../hooks/useGlobeContext.ts';
+import {useTheme} from '../hooks/useTheme.ts';
 import {cn} from '../lib/cn.ts';
+import {
+  inputClass,
+  listItemClass,
+  mutedClass,
+  panelClass,
+} from '../lib/panelStyles.ts';
 import type {Country} from '../types/country.ts';
 
 export function CountryList() {
   const {data: countries} = useCountries();
   const {selectedCode, hoveredCode} = useCountryState();
   const globe = useGlobeContext();
+  const {theme} = useTheme();
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -36,7 +44,6 @@ export function CountryList() {
     return sorted.filter((c) => c.name.common.toLowerCase().includes(q));
   }, [sorted, search]);
 
-  // Clear search only on external select (globe click), not internal list click
   useEffect(() => {
     if (!selectedCode) return;
     if (internalSelectRef.current) {
@@ -46,7 +53,6 @@ export function CountryList() {
     setSearch('');
   }, [selectedCode]);
 
-  // After search is cleared and list re-renders, scroll to the selected item
   useEffect(() => {
     if (!selectedCode || search) return;
     const el = itemRefs.current.get(selectedCode);
@@ -72,10 +78,13 @@ export function CountryList() {
     [globe],
   );
 
+  const borderClass = theme === 'dark' ? 'border-white/10' : 'border-white/15';
+
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100vh-2rem)] w-64 flex-col rounded-xl border border-white/10 bg-slate-800/90 shadow-xl backdrop-blur-md',
+        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100vh-2rem)] w-64 flex-col rounded-xl border shadow-xl',
+        panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
           ? 'max-md:bottom-52 max-md:max-h-40'
@@ -83,7 +92,7 @@ export function CountryList() {
         'max-md:transition-all max-md:duration-300',
       )}
     >
-      <div className="border-b border-white/10 px-3 py-2">
+      <div className={cn('border-b px-3 py-2', borderClass)}>
         <div className="relative">
           <input
             ref={searchRef}
@@ -91,12 +100,19 @@ export function CountryList() {
             placeholder="Search countries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg bg-slate-700/50 px-3 py-1.5 pr-8 text-sm text-white placeholder-slate-400 outline-none focus:ring-1 focus:ring-slate-500"
+            className={cn(
+              'w-full rounded-lg px-3 py-1.5 pr-8 text-sm outline-none focus:ring-1',
+              inputClass(theme),
+            )}
           />
           {search && (
             <button
               type="button"
-              className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 hover:text-white"
+              className={cn(
+                'absolute top-1/2 right-2 -translate-y-1/2',
+                mutedClass(theme),
+                'hover:text-white',
+              )}
               onClick={() => {
                 setSearch('');
                 searchRef.current?.focus();
@@ -120,6 +136,7 @@ export function CountryList() {
             country={country}
             isSelected={country.cca3 === selectedCode}
             isHovered={country.cca3 === hoveredCode}
+            theme={theme}
             onSelect={handleSelect}
             onHover={handleHover}
             ref={(el) => {
@@ -132,7 +149,7 @@ export function CountryList() {
           />
         ))}
         {filtered.length === 0 && (
-          <p className="px-3 py-4 text-center text-sm text-slate-400">
+          <p className={cn('px-3 py-4 text-center text-sm', mutedClass(theme))}>
             No countries found
           </p>
         )}
@@ -145,13 +162,14 @@ interface CountryListItemProps {
   country: Country;
   isSelected: boolean;
   isHovered: boolean;
+  theme: 'dark' | 'light';
   onSelect: (code: string) => void;
   onHover: (code: string | null) => void;
 }
 
 const CountryListItem = memo(
   forwardRef<HTMLButtonElement, CountryListItemProps>(function CountryListItem(
-    {country, isSelected, isHovered, onSelect, onHover},
+    {country, isSelected, isHovered, theme, onSelect, onHover},
     ref,
   ) {
     return (
@@ -160,11 +178,7 @@ const CountryListItem = memo(
         type="button"
         className={cn(
           'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors',
-          isSelected
-            ? 'bg-amber-500/20 text-amber-200'
-            : isHovered
-              ? 'bg-slate-700/50 text-white'
-              : 'text-slate-300 hover:bg-slate-700/30',
+          listItemClass(theme, isSelected, isHovered),
         )}
         onClick={() => onSelect(country.cca3)}
         onPointerEnter={() => onHover(country.cca3)}

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {GlobeCanvas} from './components/GlobeCanvas.tsx';
 import {CountryInfo} from './components/CountryInfo.tsx';
@@ -15,36 +15,36 @@ const queryClient = new QueryClient();
 function ViewToggle({
   view,
   onViewChange,
+  theme,
 }: {
   view: 'list' | 'table';
   onViewChange: (v: 'list' | 'table') => void;
+  theme: Theme;
 }) {
   return (
-    <div className="pointer-events-auto absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-lg border border-white/10 bg-slate-800/90 p-1 backdrop-blur-md max-md:bottom-auto max-md:top-4 max-md:left-1/2">
-      <button
-        type="button"
-        className={cn(
-          'rounded-md px-3 py-1 text-xs transition-colors',
-          view === 'list'
-            ? 'bg-slate-600 text-white'
-            : 'text-slate-400 hover:text-white',
-        )}
-        onClick={() => onViewChange('list')}
-      >
-        List
-      </button>
-      <button
-        type="button"
-        className={cn(
-          'rounded-md px-3 py-1 text-xs transition-colors',
-          view === 'table'
-            ? 'bg-slate-600 text-white'
-            : 'text-slate-400 hover:text-white',
-        )}
-        onClick={() => onViewChange('table')}
-      >
-        Table
-      </button>
+    <div
+      className={cn(
+        'pointer-events-auto absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-lg border p-1 backdrop-blur-md max-md:bottom-auto max-md:top-4 max-md:left-1/2',
+        theme === 'dark'
+          ? 'border-white/10 bg-slate-800/90'
+          : 'border-white/15 bg-slate-700/85',
+      )}
+    >
+      {(['list', 'table'] as const).map((v) => (
+        <button
+          key={v}
+          type="button"
+          className={cn(
+            'rounded-md px-3 py-1 text-xs capitalize transition-colors',
+            view === v
+              ? 'bg-slate-600 text-white'
+              : 'text-slate-400 hover:text-white',
+          )}
+          onClick={() => onViewChange(v)}
+        >
+          {v}
+        </button>
+      ))}
     </div>
   );
 }
@@ -58,23 +58,18 @@ function GlobeApp() {
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
   }, []);
 
-  // Apply theme to document for Tailwind dark mode and background
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
-
   return (
     <ThemeContext.Provider value={{theme, toggleTheme}}>
       <div
         className={cn(
           'relative h-full w-full transition-colors duration-500',
-          theme === 'dark' ? 'bg-slate-900' : 'bg-slate-200',
+          theme === 'dark' ? 'bg-slate-900' : 'bg-slate-800',
         )}
       >
         <GlobeCanvas countries={countries} theme={theme}>
           {view === 'list' ? <CountryList /> : <CountryTable />}
           <CountryInfo />
-          <ViewToggle view={view} onViewChange={setView} />
+          <ViewToggle view={view} onViewChange={setView} theme={theme} />
           <ThemeToggle />
         </GlobeCanvas>
       </div>

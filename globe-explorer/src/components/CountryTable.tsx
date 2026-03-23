@@ -19,7 +19,14 @@ import {useVirtualizer} from '@tanstack/react-virtual';
 import {useCountries} from '../hooks/useCountries.ts';
 import {useCountryState} from '../hooks/useCountryState.ts';
 import {useGlobeContext} from '../hooks/useGlobeContext.ts';
+import {useTheme} from '../hooks/useTheme.ts';
 import {cn} from '../lib/cn.ts';
+import {
+  inputClass,
+  listItemClass,
+  mutedClass,
+  panelClass,
+} from '../lib/panelStyles.ts';
 import type {ColumnDef, SortingState} from '@tanstack/react-table';
 import type {Country} from '../types/country.ts';
 
@@ -90,6 +97,7 @@ export function CountryTable() {
   const {data: countries} = useCountries();
   const {selectedCode, hoveredCode} = useCountryState();
   const globe = useGlobeContext();
+  const {theme} = useTheme();
   const [search, setSearch] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
@@ -172,7 +180,8 @@ export function CountryTable() {
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute top-4 left-4 z-10 flex w-[36rem] flex-col rounded-xl border border-white/10 bg-slate-800/90 shadow-xl backdrop-blur-md',
+        'pointer-events-auto absolute top-4 left-4 z-10 flex w-[36rem] flex-col rounded-xl border shadow-xl',
+        panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
           ? 'max-h-[calc(100vh-2rem)] max-md:bottom-52 max-md:max-h-40'
@@ -181,7 +190,12 @@ export function CountryTable() {
       )}
     >
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 px-3 py-2">
+      <div
+        className={cn(
+          'flex flex-wrap items-center gap-2 border-b px-3 py-2',
+          theme === 'dark' ? 'border-white/10' : 'border-white/15',
+        )}
+      >
         <div className="relative flex-1">
           <input
             ref={searchRef}
@@ -189,12 +203,18 @@ export function CountryTable() {
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg bg-slate-700/50 px-2 py-1 pr-7 text-sm text-white placeholder-slate-400 outline-none focus:ring-1 focus:ring-slate-500"
+            className={cn(
+              'w-full rounded-lg px-2 py-1 pr-7 text-sm outline-none focus:ring-1',
+              inputClass(theme),
+            )}
           />
           {search && (
             <button
               type="button"
-              className="absolute top-1/2 right-1.5 -translate-y-1/2 text-slate-400 hover:text-white"
+              className={cn(
+                'absolute top-1/2 right-1.5 -translate-y-1/2',
+                mutedClass(theme),
+              )}
               onClick={() => {
                 setSearch('');
                 searchRef.current?.focus();
@@ -213,7 +233,10 @@ export function CountryTable() {
         <select
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
-          className="rounded-lg bg-slate-700/50 px-2 py-1 text-sm text-white outline-none focus:ring-1 focus:ring-slate-500"
+          className={cn(
+            'rounded-lg px-2 py-1 text-sm outline-none focus:ring-1',
+            inputClass(theme),
+          )}
         >
           <option value="">All regions</option>
           {REGIONS.map((r) => (
@@ -225,7 +248,14 @@ export function CountryTable() {
       </div>
 
       {/* Header */}
-      <div className="flex border-b border-white/5 px-3 py-1 text-xs text-slate-400">
+      <div
+        className={cn(
+          'flex border-b px-3 py-1 text-xs',
+          theme === 'dark'
+            ? 'border-white/5 text-slate-400'
+            : 'border-white/10 text-slate-300',
+        )}
+      >
         {table.getHeaderGroups().map((hg) =>
           hg.headers.map((header) => (
             <div
@@ -261,6 +291,7 @@ export function CountryTable() {
                 row={row}
                 isSelected={row.original.cca3 === selectedCode}
                 isHovered={row.original.cca3 === hoveredCode}
+                theme={theme}
                 onSelect={handleSelect}
                 onHover={handleHover}
                 style={{
@@ -276,7 +307,7 @@ export function CountryTable() {
           })}
         </div>
         {rows.length === 0 && (
-          <p className="px-3 py-4 text-center text-sm text-slate-400">
+          <p className={cn('px-3 py-4 text-center text-sm', mutedClass(theme))}>
             No countries found
           </p>
         )}
@@ -291,6 +322,7 @@ interface TableRowProps {
   >['rows'][number];
   isSelected: boolean;
   isHovered: boolean;
+  theme: 'dark' | 'light';
   onSelect: (code: string) => void;
   onHover: (code: string | null) => void;
   style: React.CSSProperties;
@@ -298,7 +330,7 @@ interface TableRowProps {
 
 const TableRow = memo(
   forwardRef<HTMLDivElement, TableRowProps>(function TableRow(
-    {row, isSelected, isHovered, onSelect, onHover, style},
+    {row, isSelected, isHovered, theme, onSelect, onHover, style},
     ref,
   ) {
     return (
@@ -308,11 +340,7 @@ const TableRow = memo(
         tabIndex={0}
         className={cn(
           'flex cursor-pointer items-center px-3 text-sm transition-colors',
-          isSelected
-            ? 'bg-amber-500/20 text-amber-200'
-            : isHovered
-              ? 'bg-slate-700/50 text-white'
-              : 'text-slate-300 hover:bg-slate-700/30',
+          listItemClass(theme, isSelected, isHovered),
         )}
         style={style}
         onClick={() => onSelect(row.original.cca3)}
