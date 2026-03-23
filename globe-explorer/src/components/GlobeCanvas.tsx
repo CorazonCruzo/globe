@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {Color} from 'three';
 import {GlobeContext} from '../hooks/useGlobeContext.ts';
 import {
   createGlobeContext,
@@ -6,13 +7,27 @@ import {
 } from '../three/createGlobeContext.ts';
 import type {GlobeContextResult} from '../three/createGlobeContext.ts';
 import type {Country} from '../types/country.ts';
+import type {Theme} from '../hooks/useTheme.ts';
 
 interface GlobeCanvasProps {
   countries?: Array<Country>;
+  theme?: Theme;
   children?: React.ReactNode;
 }
 
-export function GlobeCanvas({countries, children}: GlobeCanvasProps) {
+const SCENE_BG = {
+  dark: new Color(0x0f172a),
+  light: new Color(0xc8d6e5),
+};
+
+const AMBIENT_INTENSITY = {dark: 0.4, light: 0.8};
+const DIR_INTENSITY = {dark: 1.0, light: 1.2};
+
+export function GlobeCanvas({
+  countries,
+  theme = 'dark',
+  children,
+}: GlobeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<GlobeContextResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,6 +82,25 @@ export function GlobeCanvas({countries, children}: GlobeCanvasProps) {
       setError(message);
     }
   }, [result, countries]);
+
+  // Update 3D scene on theme change
+  useEffect(() => {
+    if (!result) return;
+    const scene = result.ctx.three.scene;
+    scene.background = SCENE_BG[theme];
+
+    // Update lighting intensity
+    scene.traverse((child) => {
+      if ('isAmbientLight' in child && child.isAmbientLight) {
+        (child as unknown as {intensity: number}).intensity =
+          AMBIENT_INTENSITY[theme];
+      }
+      if ('isDirectionalLight' in child && child.isDirectionalLight) {
+        (child as unknown as {intensity: number}).intensity =
+          DIR_INTENSITY[theme];
+      }
+    });
+  }, [result, theme]);
 
   return (
     <div className="relative h-full w-full">

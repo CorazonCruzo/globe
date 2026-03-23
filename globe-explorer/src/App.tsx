@@ -1,11 +1,14 @@
-import {useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {GlobeCanvas} from './components/GlobeCanvas.tsx';
 import {CountryInfo} from './components/CountryInfo.tsx';
 import {CountryList} from './components/CountryList.tsx';
 import {CountryTable} from './components/CountryTable.tsx';
+import {ThemeToggle} from './components/ThemeToggle.tsx';
 import {useCountries} from './hooks/useCountries.ts';
+import {ThemeContext} from './hooks/useTheme.ts';
 import {cn} from './lib/cn.ts';
+import type {Theme} from './hooks/useTheme.ts';
 
 const queryClient = new QueryClient();
 
@@ -49,15 +52,33 @@ function ViewToggle({
 function GlobeApp() {
   const {data: countries} = useCountries();
   const [view, setView] = useState<'list' | 'table'>('list');
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+  }, []);
+
+  // Apply theme to document for Tailwind dark mode and background
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
 
   return (
-    <div className="relative h-full w-full bg-slate-900">
-      <GlobeCanvas countries={countries}>
-        {view === 'list' ? <CountryList /> : <CountryTable />}
-        <CountryInfo />
-        <ViewToggle view={view} onViewChange={setView} />
-      </GlobeCanvas>
-    </div>
+    <ThemeContext.Provider value={{theme, toggleTheme}}>
+      <div
+        className={cn(
+          'relative h-full w-full transition-colors duration-500',
+          theme === 'dark' ? 'bg-slate-900' : 'bg-slate-200',
+        )}
+      >
+        <GlobeCanvas countries={countries} theme={theme}>
+          {view === 'list' ? <CountryList /> : <CountryTable />}
+          <CountryInfo />
+          <ViewToggle view={view} onViewChange={setView} />
+          <ThemeToggle />
+        </GlobeCanvas>
+      </div>
+    </ThemeContext.Provider>
   );
 }
 

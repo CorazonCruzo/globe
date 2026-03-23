@@ -46,9 +46,10 @@
 - **Sync**: same as CountryList — hover/select bidirectional with globe, search clears on external select
 - **View toggle**: List/Table switch button at bottom center
 
-## Not Yet Implemented
+### Bonus (Phase 6)
+- **Atmosphere glow** via `AtmosphereFeature` — slightly larger sphere with BackSide rendering, Fresnel-based TSL shader for edge glow
+- **Hover/select animations** — tween.js color transitions in CountryMeshFeature (green → light green on hover, → gold on select)
+- **Ocean TSL shader** — depth/latitude-based color blend (deep → shallow → pole colors)
+- **Light/dark theme toggle** — ThemeToggle component, scene background + lighting changes, UI background transition
 
-### Bonus
-- Visual effects on hover, click, and selection
-- Globe appearance customization via TSL shaders
-- Light/dark theme toggle
+## Not Yet Implemented

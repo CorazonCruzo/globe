@@ -7,6 +7,7 @@ import {TweenModule} from './modules/TweenModule.ts';
 import {RaycastModule} from './modules/RaycastModule.ts';
 import {CountryStateModule} from './modules/CountryStateModule.ts';
 import {GlobeFeature} from './features/GlobeFeature.ts';
+import {AtmosphereFeature} from './features/AtmosphereFeature.ts';
 import {
   CountriesFeature,
   buildIsoMap,
@@ -64,6 +65,7 @@ export async function createGlobeContext(
 
   // Attach features to the globe root
   addFeature(globeRoot, GlobeFeature);
+  addFeature(globeRoot, AtmosphereFeature);
   const countriesFeature = addFeature(globeRoot, CountriesFeature);
 
   // Mount and run

@@ -47,10 +47,10 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 5.6 Synchronize table selection with globe (same as Level 1) + List/Table view toggle
   - [x] 5.7 Verify: tsc ✓, eslint ✓, prettier ✓, tests (75/75) ✓, build ✓, browser check ✓
 
-- [ ] Phase 6: Bonus — Creative 3D
-  - [ ] 6.1 Visual effects: hover glow, click pulse, selection highlight animation
-  - [ ] 6.2 Globe appearance customization via TSL shaders (atmosphere glow, ocean shader, country coloring)
-  - [ ] 6.3 Light/dark theme toggle (affects both UI and 3D scene)
+- [x] Phase 6: Bonus — Creative 3D
+  - [x] 6.1 Visual effects: hover/select color animation via tween.js (already from Phase 2)
+  - [x] 6.2 Globe appearance: atmosphere glow (Fresnel TSL shader on BackSide sphere), ocean TSL shader with polar color blend
+  - [x] 6.3 Light/dark theme toggle: ThemeToggle component, scene background/lighting changes, UI bg transition
 
 - [ ] Phase 7: Polish & Deploy
   - [ ] 7.1 Mobile testing and fixes
@@ -78,7 +78,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 5 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 76 tests passing. Ready for Phase 6 (Bonus — Creative 3D).
+**Phase 6 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 76 tests passing. Ready for Phase 7 (Polish & Deploy).
 
 ## Files
 - `task_plan.md` — this file

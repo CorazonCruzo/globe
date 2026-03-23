@@ -18,6 +18,7 @@ export function CountryList() {
   const {selectedCode, hoveredCode} = useCountryState();
   const globe = useGlobeContext();
   const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const internalSelectRef = useRef(false);
@@ -83,13 +84,34 @@ export function CountryList() {
       )}
     >
       <div className="border-b border-white/10 px-3 py-2">
-        <input
-          type="text"
-          placeholder="Search countries..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg bg-slate-700/50 px-3 py-1.5 text-sm text-white placeholder-slate-400 outline-none focus:ring-1 focus:ring-slate-500"
-        />
+        <div className="relative">
+          <input
+            ref={searchRef}
+            type="text"
+            placeholder="Search countries..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg bg-slate-700/50 px-3 py-1.5 pr-8 text-sm text-white placeholder-slate-400 outline-none focus:ring-1 focus:ring-slate-500"
+          />
+          {search && (
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 hover:text-white"
+              onClick={() => {
+                setSearch('');
+                searchRef.current?.focus();
+              }}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="h-3.5 w-3.5"
+              >
+                <path d="M4.28 3.22a.75.75 0 0 0-1.06 1.06L6.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06L8 9.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L9.06 8l3.72-3.72a.75.75 0 0 0-1.06-1.06L8 6.94 4.28 3.22Z" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
       <div ref={listRef} className="overflow-y-auto">
         {filtered.map((country) => (
