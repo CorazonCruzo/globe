@@ -30,11 +30,15 @@
 - Uses `useCountryState` for selection + `useCountries` for data lookup
 - Glassmorphism style: `bg-slate-800/90 backdrop-blur-md border-white/10`
 
-## Not Yet Implemented
+### CountryList (Phase 4)
+- **CountryList** component — scrollable list of all countries, sorted alphabetically, flag + name per item
+- **Search** — text input filters by country name (case-insensitive)
+- **Bidirectional sync**: list item hover → globe highlight, list click → globe select + flyTo, globe click → list scroll-to + highlight
+- Uses `useCountryState` for selection/hover, `useGlobeContext` for CountryStateModule access
+- Responsive: desktop left sidebar (w-64), mobile bottom panel
+- Memoized items (`memo` + `forwardRef`) for performance with 250 countries
 
-### Level 1 (Recommended)
-- Country list in UI with search by name
-- Synchronized hover/select state between list and globe
+## Not Yet Implemented
 
 ### Level 2 (Advanced)
 - Filtering and sorting via @tanstack/react-table

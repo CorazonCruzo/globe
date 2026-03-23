@@ -32,11 +32,11 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 3.5 Mobile responsive: info panel снизу на mobile (max-md:), touch controls (CameraModule + RaycastModule), backdrop-blur panel
   - [x] 3.6 Verify: tsc ✓, eslint ✓, prettier ✓, tests (61/61) ✓, build ✓
 
-- [ ] Phase 4: Country List & Synchronization (Level 1 — recommended)
-  - [ ] 4.1 Create CountryList component with search by name
-  - [ ] 4.2 Synchronize hover state: list item hover ↔ globe country highlight
-  - [ ] 4.3 Synchronize select state: list click → globe fly-to, globe click → list scroll-to
-  - [ ] 4.4 Verify bidirectional sync works
+- [x] Phase 4: Country List & Synchronization (Level 1 — recommended)
+  - [x] 4.1 Create CountryList component with search by name (sorted alphabetically, flag + name per item)
+  - [x] 4.2 Synchronize hover state: list item hover ↔ globe country highlight (via CountryStateModule events)
+  - [x] 4.3 Synchronize select state: list click → globe fly-to, globe click → list scroll-to (scrollIntoView)
+  - [x] 4.4 Verify: tsc ✓, eslint ✓, prettier ✓, tests (68/68) ✓, build ✓, browser check ✓
 
 - [ ] Phase 5: Table, Filtering & Virtualization (Level 2 — advanced)
   - [ ] 5.1 Install @tanstack/react-table + @tanstack/react-virtual
@@ -77,7 +77,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 3 complete** — 3D Core + UI. Globe with WebGPURenderer, country meshes (local-plane earcut + spherical subdivision), camera-controls, raycasting, CountryStateModule, TSL shaders, tween.js animations. CountryInfo panel with responsive layout. 61 tests passing. Ready for Phase 4 (Country List).
+**Phase 4 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 68 tests passing. Ready for Phase 5 (Table, Filtering & Virtualization).
 
 ## Files
 - `task_plan.md` — this file
