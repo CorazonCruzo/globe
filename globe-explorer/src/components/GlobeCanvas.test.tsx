@@ -41,7 +41,6 @@ describe('GlobeCanvas', () => {
     });
   });
 
-
   it('uses flex layout on mobile for canvas sizing', () => {
     const {container} = render(<GlobeCanvas />);
     const canvasContainer = container.querySelector('.touch-none');

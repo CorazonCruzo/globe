@@ -19,7 +19,8 @@ export function getSunDirection(date: Date = new Date()): Vector3 {
   const dayOfYear = (date.getTime() - start) / 86_400_000;
 
   // Solar declination (simplified, ignoring equation of time)
-  const declination = 23.44 * Math.sin(((360 / 365) * (dayOfYear - 81)) * DEG2RAD);
+  const declination =
+    23.44 * Math.sin((360 / 365) * (dayOfYear - 81) * DEG2RAD);
   const decRad = declination * DEG2RAD;
 
   // Subsolar longitude: at 12:00 UTC the sun is over lon=0.

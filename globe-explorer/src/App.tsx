@@ -118,11 +118,7 @@ function GlobeApp() {
             theme={theme}
             toolbar={
               <div className="flex shrink-0 items-center justify-between px-4 py-2 md:hidden">
-                <ViewToggle
-                  view={view}
-                  onViewChange={setView}
-                  theme={theme}
-                />
+                <ViewToggle view={view} onViewChange={setView} theme={theme} />
                 <ThemeButton theme={theme} onToggle={toggleTheme} />
               </div>
             }
@@ -131,11 +127,7 @@ function GlobeApp() {
             <CountryInfo />
             {/* Desktop-only: buttons as overlay */}
             <div className="hidden md:contents">
-              <ViewToggle
-                view={view}
-                onViewChange={setView}
-                theme={theme}
-              />
+              <ViewToggle view={view} onViewChange={setView} theme={theme} />
               <ThemeButton theme={theme} onToggle={toggleTheme} />
             </div>
             <ViewCameraSync view={view} />

@@ -220,7 +220,9 @@ export function distanceForArea(areaKm2: number): number {
   const log = Math.log10(a);
   // Map log range [0..7.2] to distance [9..15]
   const t = Math.min(log / 7.2, 1);
-  return FLYTO_MIN_DISTANCE + t * (CAMERA_INITIAL_DISTANCE - FLYTO_MIN_DISTANCE);
+  return (
+    FLYTO_MIN_DISTANCE + t * (CAMERA_INITIAL_DISTANCE - FLYTO_MIN_DISTANCE)
+  );
 }
 
 /** Convert a pixel offset to world units at the given camera distance */
@@ -233,8 +235,7 @@ export function pixelToWorld(
 ): number {
   const vHalfFov = (fovDeg * DEG2RAD) / 2;
   const visibleHeight = 2 * distance * Math.tan(vHalfFov);
-  const aspect =
-    Math.max(containerWidth, 1) / Math.max(containerHeight, 1);
+  const aspect = Math.max(containerWidth, 1) / Math.max(containerHeight, 1);
   const visibleWidth = visibleHeight * aspect;
   return (pixelShift / Math.max(containerWidth, 1)) * visibleWidth;
 }
