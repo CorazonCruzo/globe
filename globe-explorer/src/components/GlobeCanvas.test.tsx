@@ -43,7 +43,7 @@ describe('GlobeCanvas', () => {
 
   it('applies a mobile Y offset when provided', () => {
     const {container} = render(<GlobeCanvas canvasOffsetY="-5rem" />);
-    const canvasContainer = container.querySelector('.origin-center');
+    const canvasContainer = container.querySelector('.touch-none');
 
     expect(canvasContainer).toHaveClass(
       'max-md:translate-y-[var(--canvas-offset-y)]',

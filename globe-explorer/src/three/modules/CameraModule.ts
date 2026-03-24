@@ -131,6 +131,49 @@ export class CameraModule extends CoreContextModule<
     };
   }
 
+  /** Public getter for fit distance */
+  getComputedFitDistance(): number {
+    if (!this.controls || !this.container) return CAMERA_INITIAL_DISTANCE;
+    return this.getFitDistance(this.controls.camera, this.container);
+  }
+
+  /** Set focal offset in pixel units (converted to world units at given distance) */
+  setFocalOffsetPx(pixelX: number, pixelY: number, animate = true) {
+    if (!this.controls || !this.container) return;
+    const camera = this.controls.camera;
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+
+    const distance = this.controls.distance;
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    const worldX = pixelToWorld(pixelX, distance, camera.fov, w, h);
+    const worldY = pixelToWorld(pixelY, distance, camera.fov, w, h);
+    this.controls.setFocalOffset(worldX, worldY, 0, animate);
+  }
+
+  /** Set focal offset in pixel units using a specific distance for conversion */
+  setFocalOffsetPxAtDistance(
+    pixelX: number,
+    pixelY: number,
+    distance: number,
+    animate = true,
+  ) {
+    if (!this.controls || !this.container) return;
+    const camera = this.controls.camera;
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    const worldX = pixelToWorld(pixelX, distance, camera.fov, w, h);
+    const worldY = pixelToWorld(pixelY, distance, camera.fov, w, h);
+    this.controls.setFocalOffset(worldX, worldY, 0, animate);
+  }
+
+  /** Reset focal offset to zero */
+  clearFocalOffset(animate = true) {
+    this.controls?.setFocalOffset(0, 0, 0, animate);
+  }
+
   private getFitDistance(
     camera: THREE.Camera,
     container: HTMLDivElement,
@@ -144,4 +187,20 @@ export class CameraModule extends CoreContextModule<
       camera.fov,
     );
   }
+}
+
+/** Convert a pixel offset to world units at the given camera distance */
+export function pixelToWorld(
+  pixelShift: number,
+  distance: number,
+  fovDeg: number,
+  containerWidth: number,
+  containerHeight: number,
+): number {
+  const vHalfFov = (fovDeg * DEG2RAD) / 2;
+  const visibleHeight = 2 * distance * Math.tan(vHalfFov);
+  const aspect =
+    Math.max(containerWidth, 1) / Math.max(containerHeight, 1);
+  const visibleWidth = visibleHeight * aspect;
+  return (pixelShift / Math.max(containerWidth, 1)) * visibleWidth;
 }
