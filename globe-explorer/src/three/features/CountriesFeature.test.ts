@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {buildIsoMap} from './CountriesFeature.ts';
+import {buildBorderPositions, buildIsoMap} from './CountriesFeature.ts';
 
 describe('buildIsoMap', () => {
   it('creates a map from ccn3 to cca3', () => {
@@ -59,5 +59,47 @@ describe('buildIsoMap', () => {
     const map = buildIsoMap(countries, geoNames);
     expect(map.get('242')).toBe('FJI');
     expect(map.size).toBe(1);
+  });
+});
+
+describe('buildBorderPositions', () => {
+  it('subdivides long border segments and keeps all points on the sphere', () => {
+    const radius = 5.018;
+    const positions = buildBorderPositions(
+      [
+        [
+          [0, 0],
+          [30, 0],
+        ],
+      ],
+      radius,
+    );
+
+    expect(positions.length).toBeGreaterThan(6);
+
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = positions[i];
+      const y = positions[i + 1];
+      const z = positions[i + 2];
+      const length = Math.sqrt(x * x + y * y + z * z);
+      expect(length).toBeCloseTo(radius, 5);
+    }
+  });
+
+  it('drops duplicate vertices and skips degenerate border lines', () => {
+    const positions = buildBorderPositions(
+      [
+        [
+          [10, 10],
+          [10, 10],
+          [20, 10],
+        ],
+        [[0, 0]],
+      ],
+      5.018,
+    );
+
+    expect(positions.length).toBeGreaterThan(0);
+    expect(positions.length % 6).toBe(0);
   });
 });
