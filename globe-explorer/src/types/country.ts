@@ -23,4 +23,5 @@ export interface Country {
 export interface CountryDataEntry {
   lat: number;
   lon: number;
+  area: number;
 }

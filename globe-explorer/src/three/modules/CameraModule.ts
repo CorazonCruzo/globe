@@ -40,6 +40,7 @@ export class CameraModule extends CoreContextModule<
 > {
   private controls: CameraControls | null = null;
   private container: HTMLDivElement | null = null;
+  private _focalOffsetPx: {x: number; y: number} | null = null;
 
   protected useCtx(ctx: CoreContext<GlobeModules>) {
     const setupControls = (container: HTMLDivElement) => {
@@ -96,7 +97,7 @@ export class CameraModule extends CoreContextModule<
     };
   }
 
-  flyTo(lat: number, lon: number, animate = true) {
+  flyTo(lat: number, lon: number, area?: number, animate = true) {
     if (!this.controls) return;
 
     const azimuth = lon * DEG2RAD;
@@ -104,6 +105,23 @@ export class CameraModule extends CoreContextModule<
 
     this.controls.normalizeRotations();
     this.controls.rotateTo(azimuth, polar, animate);
+
+    // Zoom based on country area
+    if (area != null) {
+      const target = distanceForArea(area);
+      this.controls.dollyTo(target, animate);
+
+      // Recalculate focal offset for the new distance so the globe
+      // stays centered in the visible area (not pushed off-screen)
+      if (this._focalOffsetPx) {
+        this.setFocalOffsetPxAtDistance(
+          this._focalOffsetPx.x,
+          this._focalOffsetPx.y,
+          target,
+          animate,
+        );
+      }
+    }
   }
 
   /** Zoom out so the globe fits entirely in view */
@@ -162,6 +180,7 @@ export class CameraModule extends CoreContextModule<
     const camera = this.controls.camera;
     if (!(camera instanceof THREE.PerspectiveCamera)) return;
 
+    this._focalOffsetPx = {x: pixelX, y: pixelY};
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
     const worldX = pixelToWorld(pixelX, distance, camera.fov, w, h);
@@ -171,6 +190,7 @@ export class CameraModule extends CoreContextModule<
 
   /** Reset focal offset to zero */
   clearFocalOffset(animate = true) {
+    this._focalOffsetPx = null;
     this.controls?.setFocalOffset(0, 0, 0, animate);
   }
 
@@ -187,6 +207,20 @@ export class CameraModule extends CoreContextModule<
       camera.fov,
     );
   }
+}
+
+/**
+ * Map country area (km²) to camera distance.
+ * Log scale: tiny countries → close, large → far.
+ */
+const FLYTO_MIN_DISTANCE = 9;
+
+export function distanceForArea(areaKm2: number): number {
+  const a = Math.max(areaKm2, 1);
+  const log = Math.log10(a);
+  // Map log range [0..7.2] to distance [9..15]
+  const t = Math.min(log / 7.2, 1);
+  return FLYTO_MIN_DISTANCE + t * (CAMERA_INITIAL_DISTANCE - FLYTO_MIN_DISTANCE);
 }
 
 /** Convert a pixel offset to world units at the given camera distance */

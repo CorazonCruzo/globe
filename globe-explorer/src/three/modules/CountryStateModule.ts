@@ -53,7 +53,7 @@ export class CountryStateModule extends CoreContextModule<
       if (this.hasCtx) {
         const data = this.countryData.get(code);
         if (data) {
-          this.ctx.modules.camera.flyTo(data.lat, data.lon);
+          this.ctx.modules.camera.flyTo(data.lat, data.lon, data.area);
         }
       }
     }

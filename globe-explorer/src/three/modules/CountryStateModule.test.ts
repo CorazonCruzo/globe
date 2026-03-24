@@ -125,9 +125,9 @@ describe('CountryStateModule', () => {
 
     it('stores and retrieves country data', () => {
       const module = createModule();
-      module.countryData.set('USA', {lat: 38, lon: -97});
+      module.countryData.set('USA', {lat: 38, lon: -97, area: 9_833_520});
 
-      expect(module.countryData.get('USA')).toEqual({lat: 38, lon: -97});
+      expect(module.countryData.get('USA')).toEqual({lat: 38, lon: -97, area: 9_833_520});
     });
   });
 

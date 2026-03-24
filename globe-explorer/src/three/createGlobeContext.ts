@@ -107,11 +107,12 @@ export function loadCountryData(
   const {ctx, countriesFeature} = result;
   const countryState = ctx.modules.countryState;
 
-  // Store lat/lon in CountryDataMap
+  // Store lat/lon/area in CountryDataMap
   for (const c of countries) {
     countryState.countryData.set(c.cca3, {
       lat: c.latlng[0],
       lon: c.latlng[1],
+      area: c.area,
     });
   }
 
@@ -122,4 +123,7 @@ export function loadCountryData(
   // Set ISO map and build countries
   countriesFeature.setIsoMap(isoMap);
   countriesFeature.buildCountries();
+
+  // Add point markers for countries without polygon geometry
+  countriesFeature.buildMarkers(countryState.countryData);
 }

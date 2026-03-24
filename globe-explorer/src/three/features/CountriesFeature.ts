@@ -6,6 +6,8 @@ import {
   LineBasicMaterial,
   LineSegments,
   Mesh,
+  MeshBasicMaterial,
+  SphereGeometry,
   Vector3,
 } from 'three/webgpu';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
@@ -24,7 +26,11 @@ import {CountryMeshFeature} from './CountryMeshFeature.ts';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GeometryCollection, Topology} from 'topojson-specification';
 import type {Feature, MultiLineString, MultiPolygon, Polygon} from 'geojson';
+import type {CountryDataEntry} from '../../types/country.ts';
 import type {GlobeModules} from '../types.ts';
+
+const MARKER_COLOR = new Color(0x8a7a30);
+const MARKER_RADIUS = 0.015;
 
 interface CountryProperties {
   name: string;
@@ -231,6 +237,57 @@ export class CountriesFeature extends Object3DFeature<GlobeModules> {
     // Set raycast targets
     ctx.modules.raycast.setTargets(
       allMeshes.filter((m) => m.userData['countryCode'] !== null),
+    );
+  }
+
+  /**
+   * Set up a single reusable marker that shows on the globe surface when
+   * a country without polygon geometry is selected via the list/table.
+   */
+  buildMarkers(countryData: Map<string, CountryDataEntry>) {
+    if (!this.hasCtx) return;
+    const ctx = this.ctx;
+
+    // Collect codes that have API data but no mesh
+    const missingCodes = new Set<string>();
+    for (const cca3 of countryData.keys()) {
+      if (!this.meshMap.has(cca3)) missingCodes.add(cca3);
+    }
+    if (missingCodes.size === 0) return;
+
+    // Shared sphere marker — matches selected country color
+    const geometry = new SphereGeometry(MARKER_RADIUS, 32, 32);
+    const material = new MeshBasicMaterial({
+      color: MARKER_COLOR,
+      depthTest: true,
+      depthWrite: true,
+    });
+    const marker = new Mesh(geometry, material);
+    marker.visible = false;
+    marker.renderOrder = 5;
+    this.countryGroup.add(marker);
+
+    const pos = new Vector3();
+    const countryState = ctx.modules.countryState;
+
+    const showMarker = (code: string) => {
+      if (!missingCodes.has(code)) return;
+      const data = countryData.get(code);
+      if (!data) return;
+      lonLatToVec3(data.lon, data.lat, COUNTRY_RADIUS, pos);
+      marker.position.copy(pos);
+      marker.visible = true;
+    };
+
+    const hideMarker = () => {
+      marker.visible = false;
+    };
+
+    countryState.on('select', showMarker);
+    countryState.on('deselect', hideMarker);
+
+    console.log(
+      `[CountriesFeature] ${missingCodes.size} countries without polygons — marker ready`,
     );
   }
 
