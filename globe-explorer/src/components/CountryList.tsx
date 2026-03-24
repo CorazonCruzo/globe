@@ -78,7 +78,7 @@ export function CountryList() {
     [globe],
   );
 
-  const borderClass = theme === 'dark' ? 'border-white/10' : 'border-white/15';
+  const borderClass = theme === 'dark' ? 'border-white/10' : 'border-slate-200';
 
   return (
     <div
@@ -111,7 +111,7 @@ export function CountryList() {
               className={cn(
                 'absolute top-1/2 right-2 -translate-y-1/2',
                 mutedClass(theme),
-                'hover:text-white',
+                theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-800',
               )}
               onClick={() => {
                 setSearch('');

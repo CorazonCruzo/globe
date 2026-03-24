@@ -9,12 +9,12 @@ import {Object3DFeature} from '@vladkrutenyuk/three-kvy-core';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GlobeModules} from '../types.ts';
 
-const STAR_COUNT = 900;
+const STAR_COUNT = 2500;
 const STARFIELD_RADIUS = 80;
 const STARFIELD_RADIUS_VARIANCE = 10;
-const STAR_MIN_BRIGHTNESS = 0.35;
-const STAR_MAX_BRIGHTNESS = 0.85;
-const STAR_SIZE = 1.15;
+const STAR_MIN_BRIGHTNESS = 0.6;
+const STAR_MAX_BRIGHTNESS = 1.0;
+const STAR_SIZE = 1.6;
 const STARFIELD_SEED = 0x51a7f1d;
 
 export interface StarfieldAttributes {
@@ -77,7 +77,7 @@ export class StarfieldFeature extends Object3DFeature<GlobeModules> {
       sizeAttenuation: false,
       vertexColors: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 1.0,
       depthTest: true,
       depthWrite: false,
     });

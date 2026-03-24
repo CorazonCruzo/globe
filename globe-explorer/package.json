@@ -63,5 +63,11 @@
     "typescript-eslint": "^8.57.0",
     "vite": "^6.4.1",
     "vitest": "^4.1.0"
+  },
+  "overrides": {
+    "@vladkrutenyuk/three-kvy-core": {
+      "three": "$three",
+      "@types/three": "$@types/three"
+    }
   }
 }

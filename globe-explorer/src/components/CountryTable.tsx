@@ -197,7 +197,7 @@ export function CountryTable() {
       <div
         className={cn(
           'flex flex-wrap items-center gap-2 border-b px-3 py-2',
-          theme === 'dark' ? 'border-white/10' : 'border-white/15',
+          theme === 'dark' ? 'border-white/10' : 'border-slate-200',
         )}
       >
         <div className="relative flex-1">
@@ -263,8 +263,9 @@ export function CountryTable() {
                   value={null}
                   className={cn(
                     'flex cursor-pointer items-center px-3 py-1.5 text-sm outline-none',
-                    'data-highlighted:bg-slate-600/40 data-highlighted:text-white',
-                    theme === 'dark' ? 'text-slate-300' : 'text-slate-200',
+                    theme === 'dark'
+                      ? 'data-highlighted:bg-slate-600/40 data-highlighted:text-white text-slate-300'
+                      : 'data-highlighted:bg-slate-200 data-highlighted:text-slate-900 text-slate-700',
                   )}
                 >
                   <Select.ItemText>All regions</Select.ItemText>
@@ -276,7 +277,7 @@ export function CountryTable() {
                     className={cn(
                       'flex cursor-pointer items-center px-3 py-1.5 text-sm outline-none',
                       'data-highlighted:bg-slate-600/40 data-highlighted:text-white',
-                      theme === 'dark' ? 'text-slate-300' : 'text-slate-200',
+                      theme === 'dark' ? 'text-slate-300' : 'text-slate-800',
                     )}
                   >
                     <Select.ItemText>{r}</Select.ItemText>
@@ -296,7 +297,7 @@ export function CountryTable() {
               'flex border-b px-3 py-1 text-xs',
               theme === 'dark'
                 ? 'border-white/5 text-slate-400'
-                : 'border-white/10 text-slate-300',
+                : 'border-slate-200 text-slate-500',
             )}
           >
             {table.getHeaderGroups().map((hg) =>
@@ -306,7 +307,9 @@ export function CountryTable() {
                   className={cn(
                     'shrink-0 select-none',
                     header.column.getCanSort() &&
-                      'cursor-pointer hover:text-white',
+                      (theme === 'dark'
+                        ? 'cursor-pointer hover:text-white'
+                        : 'cursor-pointer hover:text-slate-800'),
                   )}
                   style={{width: header.getSize()}}
                   onClick={header.column.getToggleSortingHandler()}

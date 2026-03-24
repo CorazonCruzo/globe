@@ -1,5 +1,4 @@
 import {
-  Clock,
   Color,
   Group,
   PerspectiveCamera,
@@ -20,6 +19,7 @@ import {
   buildIsoMap,
   getGeoNames,
 } from './features/CountriesFeature.ts';
+import {createClock} from './FrameClock.ts';
 import type {GlobeModules} from './types.ts';
 import type {Country} from '../types/country.ts';
 
@@ -70,7 +70,7 @@ export async function createGlobeContext(
     renderer,
     camera,
     scene,
-    clock: new Clock(),
+    clock: createClock(),
     modules: {
       camera: new CameraModule(),
       tween: new TweenModule(),

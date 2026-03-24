@@ -36,7 +36,7 @@ function ViewToggle({
           'pointer-events-auto absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-lg border p-1 backdrop-blur-md max-md:bottom-auto max-md:top-[calc(1rem+env(safe-area-inset-top))] max-md:left-1/2',
           theme === 'dark'
             ? 'border-white/10 bg-slate-800/90'
-            : 'border-white/15 bg-slate-700/85',
+            : 'border-slate-200 bg-slate-100 shadow-lg',
         )}
       >
         {(['list', 'table'] as const).map((v) => (
@@ -46,8 +46,12 @@ function ViewToggle({
             className={cn(
               'cursor-pointer rounded-md px-3 py-1 text-xs capitalize transition-colors max-md:px-4 max-md:py-2 max-md:text-sm',
               view === v
-                ? 'bg-slate-600 text-white'
-                : 'text-slate-400 hover:text-white',
+                ? theme === 'dark'
+                  ? 'bg-slate-600 text-white'
+                  : 'bg-slate-700 text-white'
+                : theme === 'dark'
+                  ? 'text-slate-400 hover:text-white'
+                  : 'text-slate-500 hover:text-slate-800',
             )}
           >
             {v}
@@ -66,7 +70,7 @@ function ThemeButton({theme, onToggle}: {theme: Theme; onToggle: () => void}) {
         'pointer-events-auto absolute right-4 bottom-4 z-10 rounded-lg border px-3 py-1.5 text-xs backdrop-blur-md transition-colors max-md:bottom-auto max-md:top-[calc(1rem+env(safe-area-inset-top))] max-md:px-4 max-md:py-2.5 max-md:text-sm',
         theme === 'dark'
           ? 'border-white/10 bg-slate-800/90 text-slate-400 hover:text-white'
-          : 'border-white/15 bg-slate-700/85 text-slate-300 hover:text-white',
+          : 'border-slate-200 bg-slate-100 text-slate-500 shadow-lg hover:text-slate-800',
       )}
       onClick={onToggle}
     >
