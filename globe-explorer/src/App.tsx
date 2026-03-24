@@ -87,6 +87,7 @@ function GlobeApp() {
           countries={countries}
           theme={theme}
           canvasOffsetX={view === 'table' ? '18rem' : undefined}
+          canvasOffsetY="-5rem"
         >
           {view === 'list' ? <CountryList /> : <CountryTable />}
           <CountryInfo />

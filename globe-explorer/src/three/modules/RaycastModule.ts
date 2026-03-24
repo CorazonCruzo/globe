@@ -81,6 +81,16 @@ export class RaycastModule extends CoreContextModule<
       } else {
         countryState.select(null);
       }
+
+      if (e.pointerType !== 'mouse') {
+        countryState.hover(null);
+        if (activeContainer) activeContainer.style.cursor = 'default';
+      }
+    };
+
+    const onPointerLeave = () => {
+      ctx.modules.countryState.hover(null);
+      if (activeContainer) activeContainer.style.cursor = 'default';
     };
 
     const attachListeners = (container: HTMLDivElement) => {
@@ -88,6 +98,7 @@ export class RaycastModule extends CoreContextModule<
       container.addEventListener('pointerdown', onPointerDown);
       container.addEventListener('pointermove', onPointerMove);
       container.addEventListener('pointerup', onPointerUp);
+      container.addEventListener('pointerleave', onPointerLeave);
     };
 
     const container = ctx.three.container;
@@ -102,6 +113,7 @@ export class RaycastModule extends CoreContextModule<
         activeContainer.removeEventListener('pointerdown', onPointerDown);
         activeContainer.removeEventListener('pointermove', onPointerMove);
         activeContainer.removeEventListener('pointerup', onPointerUp);
+        activeContainer.removeEventListener('pointerleave', onPointerLeave);
         activeContainer.style.cursor = 'default';
       }
     };

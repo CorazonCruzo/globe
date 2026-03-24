@@ -20,6 +20,8 @@ interface GlobeCanvasProps {
   theme?: Theme;
   /** CSS translateX for the 3D canvas, e.g. "30%" to shift globe right */
   canvasOffsetX?: string;
+  /** CSS translateY for the 3D canvas on mobile, e.g. "-5rem" to shift globe upward */
+  canvasOffsetY?: string;
   children?: React.ReactNode;
 }
 
@@ -27,11 +29,13 @@ export function GlobeCanvas({
   countries,
   theme = 'dark',
   canvasOffsetX,
+  canvasOffsetY,
   children,
 }: GlobeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<GlobeContextResult | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rendererReady, setRendererReady] = useState(false);
+  const [countriesReady, setCountriesReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dataLoadedRef = useRef(false);
 
@@ -51,7 +55,7 @@ export function GlobeCanvas({
         }
         contextResult = res;
         setResult(res);
-        setLoading(false);
+        setRendererReady(true);
       })
       .catch((err: unknown) => {
         if (destroyed) return;
@@ -59,7 +63,6 @@ export function GlobeCanvas({
           err instanceof Error ? err.message : 'Unknown renderer error';
         console.error('[GlobeCanvas] Failed to initialize 3D scene:', err);
         setError(message);
-        setLoading(false);
       });
 
     return () => {
@@ -76,6 +79,7 @@ export function GlobeCanvas({
     dataLoadedRef.current = true;
     try {
       loadCountryData(result, countries);
+      setCountriesReady(true);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'Unknown country data error';
@@ -90,6 +94,11 @@ export function GlobeCanvas({
     result.ctx.three.scene.background = SCENE_BG[theme];
   }, [result, theme]);
 
+  const loading = !error && (!rendererReady || !countriesReady);
+  const loadingLabel = rendererReady
+    ? 'Loading countries...'
+    : 'Loading 3D scene...';
+
   return (
     <div className="relative h-full w-full">
       <div
@@ -97,18 +106,22 @@ export function GlobeCanvas({
         className={cn(
           'h-full w-full origin-center transition-transform duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
           canvasOffsetX
-            ? 'md:translate-x-[var(--canvas-offset)] md:scale-[0.65]'
+            ? 'md:translate-x-[var(--canvas-offset-x)] md:scale-[0.65]'
             : '',
+          canvasOffsetY ? 'max-md:translate-y-[var(--canvas-offset-y)]' : '',
         )}
         style={
-          canvasOffsetX
-            ? ({'--canvas-offset': canvasOffsetX} as React.CSSProperties)
+          canvasOffsetX || canvasOffsetY
+            ? ({
+                ...(canvasOffsetX ? {'--canvas-offset-x': canvasOffsetX} : {}),
+                ...(canvasOffsetY ? {'--canvas-offset-y': canvasOffsetY} : {}),
+              } as React.CSSProperties)
             : undefined
         }
       />
       {loading && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-white">
-          <p className="text-lg">Loading 3D scene...</p>
+          <p className="text-lg">{loadingLabel}</p>
         </div>
       )}
       {error && (

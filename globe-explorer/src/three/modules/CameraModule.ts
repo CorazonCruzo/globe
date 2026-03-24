@@ -8,17 +8,38 @@ import {
   CAMERA_MIN_DISTANCE,
   CAMERA_MIN_POLAR,
   DEG2RAD,
+  GLOBE_RADIUS,
 } from '../../lib/constants.ts';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GlobeModules} from '../types.ts';
 
 CameraControls.install({THREE});
 
+const CAMERA_FIT_PADDING = 1.08;
+
+export function getFitDistanceForViewport(
+  width: number,
+  height: number,
+  fovDeg: number,
+  radius: number = GLOBE_RADIUS,
+): number {
+  const safeWidth = Math.max(width, 1);
+  const safeHeight = Math.max(height, 1);
+  const aspect = safeWidth / safeHeight;
+  const vHalfFov = (fovDeg * DEG2RAD) / 2;
+  const hHalfFov = Math.atan(Math.tan(vHalfFov) * aspect);
+  const limitingHalfFov = Math.min(vHalfFov, hHalfFov);
+  const fitDistance = (radius / Math.sin(limitingHalfFov)) * CAMERA_FIT_PADDING;
+
+  return Math.max(CAMERA_INITIAL_DISTANCE, fitDistance);
+}
+
 export class CameraModule extends CoreContextModule<
   string | symbol,
   GlobeModules
 > {
   private controls: CameraControls | null = null;
+  private container: HTMLDivElement | null = null;
 
   protected useCtx(ctx: CoreContext<GlobeModules>) {
     const setupControls = (container: HTMLDivElement) => {
@@ -27,6 +48,7 @@ export class CameraModule extends CoreContextModule<
       const {camera} = ctx.three;
       const controls = new CameraControls(camera, container);
       this.controls = controls;
+      this.container = container;
 
       controls.minDistance = CAMERA_MIN_DISTANCE;
       controls.maxDistance = CAMERA_MAX_DISTANCE;
@@ -50,7 +72,7 @@ export class CameraModule extends CoreContextModule<
       controls.truckSpeed = 0;
 
       // Set initial distance
-      controls.dollyTo(CAMERA_INITIAL_DISTANCE, false);
+      controls.dollyTo(this.getFitDistance(camera, container), false);
     };
 
     const onBeforeRender = () => {
@@ -70,6 +92,7 @@ export class CameraModule extends CoreContextModule<
       ctx.three.off('renderbefore', onBeforeRender);
       this.controls?.dispose();
       this.controls = null;
+      this.container = null;
     };
   }
 
@@ -85,19 +108,40 @@ export class CameraModule extends CoreContextModule<
 
   /** Zoom out so the globe fits entirely in view */
   zoomToFit(animate = true) {
-    if (!this.controls) return;
-    this.controls.dollyTo(CAMERA_INITIAL_DISTANCE, animate);
+    if (!this.controls || !this.container) return;
+    this.controls.dollyTo(
+      this.getFitDistance(this.controls.camera, this.container),
+      animate,
+    );
   }
 
   /** Save current distance, zoom to fit, return restore function */
   pushZoomToFit(animate = true): () => void {
-    if (!this.controls) return () => {};
+    if (!this.controls || !this.container) return () => {};
     const saved = this.controls.distance;
-    if (this.controls.distance < CAMERA_INITIAL_DISTANCE) {
-      this.controls.dollyTo(CAMERA_INITIAL_DISTANCE, animate);
+    const fitDistance = this.getFitDistance(
+      this.controls.camera,
+      this.container,
+    );
+    if (this.controls.distance < fitDistance) {
+      this.controls.dollyTo(fitDistance, animate);
     }
     return () => {
       this.controls?.dollyTo(saved, animate);
     };
+  }
+
+  private getFitDistance(
+    camera: THREE.Camera,
+    container: HTMLDivElement,
+  ): number {
+    if (!(camera instanceof THREE.PerspectiveCamera)) {
+      return CAMERA_INITIAL_DISTANCE;
+    }
+    return getFitDistanceForViewport(
+      container.clientWidth,
+      container.clientHeight,
+      camera.fov,
+    );
   }
 }

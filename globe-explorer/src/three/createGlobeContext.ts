@@ -8,6 +8,7 @@ import {RaycastModule} from './modules/RaycastModule.ts';
 import {CountryStateModule} from './modules/CountryStateModule.ts';
 import {GlobeFeature} from './features/GlobeFeature.ts';
 import {AtmosphereFeature} from './features/AtmosphereFeature.ts';
+import {StarfieldFeature} from './features/StarfieldFeature.ts';
 import {
   CountriesFeature,
   buildIsoMap,
@@ -64,6 +65,7 @@ export async function createGlobeContext(
   ctx.root.add(globeRoot);
 
   // Attach features to the globe root
+  addFeature(globeRoot, StarfieldFeature);
   addFeature(globeRoot, GlobeFeature);
   addFeature(globeRoot, AtmosphereFeature);
   const countriesFeature = addFeature(globeRoot, CountriesFeature);
