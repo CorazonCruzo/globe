@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import {GlobeContext} from '../hooks/useGlobeContext.ts';
-import {cn} from '../lib/cn.ts';
 import {
   createGlobeContext,
   loadCountryData,
@@ -15,8 +14,8 @@ interface GlobeCanvasProps {
   /** Error from country data fetch (react-query) */
   countriesError?: Error | null;
   theme?: Theme;
-  /** CSS translateY for the 3D canvas on mobile, e.g. "-5rem" to shift globe upward */
-  canvasOffsetY?: string;
+  /** Mobile toolbar rendered before canvas in flex flow */
+  toolbar?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -24,7 +23,7 @@ export function GlobeCanvas({
   countries,
   countriesError,
   theme = 'dark',
-  canvasOffsetY,
+  toolbar,
   children,
 }: GlobeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -103,17 +102,10 @@ export function GlobeCanvas({
 
   return (
     <div className="relative h-full w-full">
+      {toolbar}
       <div
         ref={containerRef}
-        className={cn(
-          'h-full w-full touch-none',
-          canvasOffsetY ? 'max-md:translate-y-[var(--canvas-offset-y)]' : '',
-        )}
-        style={
-          canvasOffsetY
-            ? ({'--canvas-offset-y': canvasOffsetY} as React.CSSProperties)
-            : undefined
-        }
+        className="w-full touch-none max-md:h-[55dvh] md:h-full"
       />
       {loading && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-white">

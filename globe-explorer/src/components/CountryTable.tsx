@@ -186,6 +186,7 @@ export function CountryTable() {
       className={cn(
         'pointer-events-auto absolute top-4 left-4 z-10 flex w-[36rem] flex-col rounded-xl border shadow-xl',
         panelClass(theme),
+        'max-lg:w-64',
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
           ? 'max-h-[calc(100dvh-2rem)] max-md:hidden'

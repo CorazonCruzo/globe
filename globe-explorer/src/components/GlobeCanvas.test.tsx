@@ -41,13 +41,11 @@ describe('GlobeCanvas', () => {
     });
   });
 
-  it('applies a mobile Y offset when provided', () => {
-    const {container} = render(<GlobeCanvas canvasOffsetY="-5rem" />);
+
+  it('uses flex layout on mobile for canvas sizing', () => {
+    const {container} = render(<GlobeCanvas />);
     const canvasContainer = container.querySelector('.touch-none');
 
-    expect(canvasContainer).toHaveClass(
-      'max-md:translate-y-[var(--canvas-offset-y)]',
-    );
-    expect(canvasContainer).toHaveStyle({'--canvas-offset-y': '-5rem'});
+    expect(canvasContainer).toHaveClass('max-md:h-[55dvh]');
   });
 });

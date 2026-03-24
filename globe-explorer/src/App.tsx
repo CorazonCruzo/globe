@@ -33,7 +33,7 @@ function ViewToggle({
     >
       <Tabs.List
         className={cn(
-          'pointer-events-auto absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-lg border p-1 backdrop-blur-md max-md:bottom-auto max-md:top-[calc(1rem+env(safe-area-inset-top))] max-md:left-1/2',
+          'pointer-events-auto absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-lg border p-1 backdrop-blur-md max-md:static max-md:translate-x-0',
           theme === 'dark'
             ? 'border-white/10 bg-slate-800/90'
             : 'border-slate-200 bg-slate-100 shadow-lg',
@@ -67,7 +67,7 @@ function ThemeButton({theme, onToggle}: {theme: Theme; onToggle: () => void}) {
     <button
       type="button"
       className={cn(
-        'pointer-events-auto absolute right-4 bottom-4 z-10 rounded-lg border px-3 py-1.5 text-xs backdrop-blur-md transition-colors max-md:bottom-auto max-md:top-[calc(1rem+env(safe-area-inset-top))] max-md:px-4 max-md:py-2.5 max-md:text-sm',
+        'pointer-events-auto absolute right-4 bottom-4 z-10 rounded-lg border px-3 py-1.5 text-xs backdrop-blur-md transition-colors max-md:static max-md:px-4 max-md:py-2.5 max-md:text-sm',
         theme === 'dark'
           ? 'border-white/10 bg-slate-800/90 text-slate-400 hover:text-white'
           : 'border-slate-200 bg-slate-100 text-slate-500 shadow-lg hover:text-slate-800',
@@ -116,12 +116,28 @@ function GlobeApp() {
             countries={countries}
             countriesError={countriesError}
             theme={theme}
-            canvasOffsetY="-5rem"
+            toolbar={
+              <div className="flex shrink-0 items-center justify-between px-4 py-2 md:hidden">
+                <ViewToggle
+                  view={view}
+                  onViewChange={setView}
+                  theme={theme}
+                />
+                <ThemeButton theme={theme} onToggle={toggleTheme} />
+              </div>
+            }
           >
             {view === 'list' ? <CountryList /> : <CountryTable />}
             <CountryInfo />
-            <ViewToggle view={view} onViewChange={setView} theme={theme} />
-            <ThemeButton theme={theme} onToggle={toggleTheme} />
+            {/* Desktop-only: buttons as overlay */}
+            <div className="hidden md:contents">
+              <ViewToggle
+                view={view}
+                onViewChange={setView}
+                theme={theme}
+              />
+              <ThemeButton theme={theme} onToggle={toggleTheme} />
+            </div>
             <ViewCameraSync view={view} />
           </GlobeCanvas>
         </Suspense>
