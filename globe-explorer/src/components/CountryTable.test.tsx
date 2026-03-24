@@ -109,6 +109,12 @@ describe('CountryTable', () => {
     expect(getByText('No countries found')).toBeInTheDocument();
   });
 
+  it('renders a horizontally scrollable table viewport', () => {
+    const {container} = render(<CountryTable />);
+    expect(container.querySelector('.overflow-x-auto')).toBeInTheDocument();
+    expect(container.querySelector('[style*="min-width: 590px"]')).toBeTruthy();
+  });
+
   it('clears region filter when country is selected from globe', async () => {
     const {useCountryState} = await import('../hooks/useCountryState.ts');
 

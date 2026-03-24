@@ -1,5 +1,6 @@
-import {useCountryState} from '../hooks/useCountryState.ts';
 import {useCountries} from '../hooks/useCountries.ts';
+import {useCountryState} from '../hooks/useCountryState.ts';
+import {useGlobeContext} from '../hooks/useGlobeContext.ts';
 import {useTheme} from '../hooks/useTheme.ts';
 import {cn} from '../lib/cn.ts';
 import {mutedClass, panelClass} from '../lib/panelStyles.ts';
@@ -102,6 +103,7 @@ export function CountryInfo() {
   const {selectedCode} = useCountryState();
   const {data: countries} = useCountries();
   const {theme} = useTheme();
+  const globe = useGlobeContext();
 
   const country = selectedCode
     ? countries?.find((c) => c.cca3 === selectedCode)
@@ -121,11 +123,23 @@ export function CountryInfo() {
       {country && (
         <div
           className={cn(
-            'rounded-xl border px-3 py-2.5 shadow-xl',
+            'relative rounded-xl border px-3 py-2.5 shadow-xl',
             panelClass(theme),
             'max-md:rounded-b-none max-md:rounded-t-xl',
           )}
         >
+          <button
+            type="button"
+            className={cn(
+              'absolute top-2 right-2 hidden rounded-full p-1 max-md:block',
+              mutedClass(theme),
+            )}
+            onClick={() => globe?.ctx.modules.countryState.select(null)}
+          >
+            <svg viewBox="0 0 16 16" fill="currentColor" className="h-4 w-4">
+              <path d="M4.28 3.22a.75.75 0 0 0-1.06 1.06L6.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06L8 9.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L9.06 8l3.72-3.72a.75.75 0 0 0-1.06-1.06L8 6.94 4.28 3.22Z" />
+            </svg>
+          </button>
           <CountryDetails country={country} theme={theme} />
         </div>
       )}

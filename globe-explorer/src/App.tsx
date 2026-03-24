@@ -4,7 +4,7 @@ import {GlobeCanvas} from './components/GlobeCanvas.tsx';
 import {CountryInfo} from './components/CountryInfo.tsx';
 import {CountryList} from './components/CountryList.tsx';
 import {CountryTable} from './components/CountryTable.tsx';
-import {ThemeToggle} from './components/ThemeToggle.tsx';
+import {ViewCameraSync} from './components/ViewCameraSync.tsx';
 import {useCountries} from './hooks/useCountries.ts';
 import {ThemeContext} from './hooks/useTheme.ts';
 import {cn} from './lib/cn.ts';
@@ -49,6 +49,23 @@ function ViewToggle({
   );
 }
 
+function ThemeButton({theme, onToggle}: {theme: Theme; onToggle: () => void}) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        'pointer-events-auto absolute right-4 bottom-4 z-10 rounded-lg border px-3 py-1.5 text-xs backdrop-blur-md transition-colors max-md:bottom-auto max-md:top-4',
+        theme === 'dark'
+          ? 'border-white/10 bg-slate-800/90 text-slate-400 hover:text-white'
+          : 'border-white/15 bg-slate-700/85 text-slate-300 hover:text-white',
+      )}
+      onClick={onToggle}
+    >
+      {theme === 'dark' ? '\u2600\uFE0F Light' : '\uD83C\uDF19 Dark'}
+    </button>
+  );
+}
+
 function GlobeApp() {
   const {data: countries} = useCountries();
   const [view, setView] = useState<'list' | 'table'>('list');
@@ -66,11 +83,16 @@ function GlobeApp() {
           theme === 'dark' ? 'bg-slate-900' : 'bg-slate-800',
         )}
       >
-        <GlobeCanvas countries={countries} theme={theme}>
+        <GlobeCanvas
+          countries={countries}
+          theme={theme}
+          canvasOffsetX={view === 'table' ? '18rem' : undefined}
+        >
           {view === 'list' ? <CountryList /> : <CountryTable />}
           <CountryInfo />
           <ViewToggle view={view} onViewChange={setView} theme={theme} />
-          <ThemeToggle />
+          <ThemeButton theme={theme} onToggle={toggleTheme} />
+          <ViewCameraSync view={view} />
         </GlobeCanvas>
       </div>
     </ThemeContext.Provider>

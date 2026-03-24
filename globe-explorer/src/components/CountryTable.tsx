@@ -93,6 +93,8 @@ const REGIONS = [
   'Oceania',
 ];
 
+const TABLE_HORIZONTAL_PADDING = 24;
+
 export function CountryTable() {
   const {data: countries} = useCountries();
   const {selectedCode, hoveredCode} = useCountryState();
@@ -132,6 +134,7 @@ export function CountryTable() {
   });
 
   const {rows} = table.getRowModel();
+  const tableWidth = table.getTotalSize() + TABLE_HORIZONTAL_PADDING;
 
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -184,7 +187,7 @@ export function CountryTable() {
         panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
-          ? 'max-h-[calc(100vh-2rem)] max-md:bottom-52 max-md:max-h-40'
+          ? 'max-h-[calc(100vh-2rem)] max-md:hidden'
           : 'max-h-[calc(100vh-2rem)] max-md:bottom-4 max-md:max-h-60',
         'max-md:transition-all max-md:duration-300',
       )}
@@ -234,9 +237,14 @@ export function CountryTable() {
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
           className={cn(
-            'rounded-lg px-2 py-1 text-sm outline-none focus:ring-1',
+            'appearance-none rounded-lg py-1 pl-3 pr-7 text-sm outline-none focus:ring-1',
+            'bg-[length:16px_16px] bg-[position:right_6px_center] bg-no-repeat',
             inputClass(theme),
           )}
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239ca3af'%3E%3Cpath d='M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z'/%3E%3C/svg%3E\")",
+          }}
         >
           <option value="">All regions</option>
           {REGIONS.map((r) => (
@@ -247,70 +255,83 @@ export function CountryTable() {
         </select>
       </div>
 
-      {/* Header */}
-      <div
-        className={cn(
-          'flex border-b px-3 py-1 text-xs',
-          theme === 'dark'
-            ? 'border-white/5 text-slate-400'
-            : 'border-white/10 text-slate-300',
-        )}
-      >
-        {table.getHeaderGroups().map((hg) =>
-          hg.headers.map((header) => (
-            <div
-              key={header.id}
-              className={cn(
-                'shrink-0 select-none',
-                header.column.getCanSort() && 'cursor-pointer hover:text-white',
-              )}
-              style={{width: header.getSize()}}
-              onClick={header.column.getToggleSortingHandler()}
-            >
-              {flexRender(header.column.columnDef.header, header.getContext())}
-              {header.column.getIsSorted() === 'asc' && ' \u2191'}
-              {header.column.getIsSorted() === 'desc' && ' \u2193'}
-            </div>
-          )),
-        )}
-      </div>
+      <div className="overflow-x-auto overscroll-x-contain">
+        <div style={{minWidth: tableWidth}}>
+          {/* Header */}
+          <div
+            className={cn(
+              'flex border-b px-3 py-1 text-xs',
+              theme === 'dark'
+                ? 'border-white/5 text-slate-400'
+                : 'border-white/10 text-slate-300',
+            )}
+          >
+            {table.getHeaderGroups().map((hg) =>
+              hg.headers.map((header) => (
+                <div
+                  key={header.id}
+                  className={cn(
+                    'shrink-0 select-none',
+                    header.column.getCanSort() &&
+                      'cursor-pointer hover:text-white',
+                  )}
+                  style={{width: header.getSize()}}
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                  {header.column.getIsSorted() === 'asc' && ' \u2191'}
+                  {header.column.getIsSorted() === 'desc' && ' \u2193'}
+                </div>
+              )),
+            )}
+          </div>
 
-      {/* Virtualized rows */}
-      <div ref={parentRef} className="overflow-y-auto">
-        <div
-          style={{
-            height: virtualizer.getTotalSize(),
-            position: 'relative',
-          }}
-        >
-          {virtualizer.getVirtualItems().map((virtualRow) => {
-            const row = rows[virtualRow.index];
-            return (
-              <TableRow
-                key={row.original.cca3}
-                row={row}
-                isSelected={row.original.cca3 === selectedCode}
-                isHovered={row.original.cca3 === hoveredCode}
-                theme={theme}
-                onSelect={handleSelect}
-                onHover={handleHover}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: virtualRow.size,
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              />
-            );
-          })}
+          {/* Virtualized rows */}
+          <div ref={parentRef} className="overflow-y-auto">
+            <div
+              style={{
+                height: virtualizer.getTotalSize(),
+                position: 'relative',
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                const row = rows[virtualRow.index];
+                return (
+                  <TableRow
+                    key={row.original.cca3}
+                    row={row}
+                    isSelected={row.original.cca3 === selectedCode}
+                    isHovered={row.original.cca3 === hoveredCode}
+                    theme={theme}
+                    onSelect={handleSelect}
+                    onHover={handleHover}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: virtualRow.size,
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  />
+                );
+              })}
+            </div>
+            {rows.length === 0 && (
+              <p
+                className={cn(
+                  'px-3 py-4 text-center text-sm',
+                  mutedClass(theme),
+                )}
+              >
+                No countries found
+              </p>
+            )}
+          </div>
         </div>
-        {rows.length === 0 && (
-          <p className={cn('px-3 py-4 text-center text-sm', mutedClass(theme))}>
-            No countries found
-          </p>
-        )}
       </div>
     </div>
   );

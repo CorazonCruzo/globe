@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Color} from 'three';
 import {GlobeContext} from '../hooks/useGlobeContext.ts';
+import {cn} from '../lib/cn.ts';
 import {
   createGlobeContext,
   loadCountryData,
@@ -17,12 +18,15 @@ const SCENE_BG = {
 interface GlobeCanvasProps {
   countries?: Array<Country>;
   theme?: Theme;
+  /** CSS translateX for the 3D canvas, e.g. "30%" to shift globe right */
+  canvasOffsetX?: string;
   children?: React.ReactNode;
 }
 
 export function GlobeCanvas({
   countries,
   theme = 'dark',
+  canvasOffsetX,
   children,
 }: GlobeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,7 +92,20 @@ export function GlobeCanvas({
 
   return (
     <div className="relative h-full w-full">
-      <div ref={containerRef} className="h-full w-full" />
+      <div
+        ref={containerRef}
+        className={cn(
+          'h-full w-full origin-center transition-transform duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+          canvasOffsetX
+            ? 'md:translate-x-[var(--canvas-offset)] md:scale-[0.65]'
+            : '',
+        )}
+        style={
+          canvasOffsetX
+            ? ({'--canvas-offset': canvasOffsetX} as React.CSSProperties)
+            : undefined
+        }
+      />
       {loading && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-white">
           <p className="text-lg">Loading 3D scene...</p>

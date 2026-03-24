@@ -82,4 +82,22 @@ export class CameraModule extends CoreContextModule<
     this.controls.normalizeRotations();
     this.controls.rotateTo(azimuth, polar, animate);
   }
+
+  /** Zoom out so the globe fits entirely in view */
+  zoomToFit(animate = true) {
+    if (!this.controls) return;
+    this.controls.dollyTo(CAMERA_INITIAL_DISTANCE, animate);
+  }
+
+  /** Save current distance, zoom to fit, return restore function */
+  pushZoomToFit(animate = true): () => void {
+    if (!this.controls) return () => {};
+    const saved = this.controls.distance;
+    if (this.controls.distance < CAMERA_INITIAL_DISTANCE) {
+      this.controls.dollyTo(CAMERA_INITIAL_DISTANCE, animate);
+    }
+    return () => {
+      this.controls?.dollyTo(saved, animate);
+    };
+  }
 }

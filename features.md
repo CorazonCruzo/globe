@@ -47,9 +47,9 @@
 - **View toggle**: List/Table switch button at bottom center
 
 ### Bonus (Phase 6)
-- **Atmosphere glow** via `AtmosphereFeature` — slightly larger sphere with BackSide rendering, Fresnel-based TSL shader for edge glow
+- **Atmosphere glow** — `AtmosphereFeature` and `atmosphereShader.ts` files exist but are **disabled** (not wired in `createGlobeContext`). The Fresnel-based TSL shader for edge glow is implemented but inactive.
 - **Hover/select animations** — tween.js color transitions in CountryMeshFeature (green → light green on hover, → gold on select)
 - **Ocean TSL shader** — depth/latitude-based color blend (deep → shallow → pole colors)
-- **Light/dark theme toggle** — ThemeToggle component, scene background + lighting changes, UI background transition
+- **Light/dark theme toggle** — ThemeButton inline in `App.tsx` (not a separate ThemeToggle component). Theme changes `scene.background` in `GlobeCanvas.tsx` only (does NOT change lighting). UI background transition works via CSS.
 
 ## Not Yet Implemented

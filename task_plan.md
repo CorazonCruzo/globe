@@ -22,7 +22,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 2.5 Create CountriesFeature — load world-atlas TopoJSON, создать per-country меши на R+0.01 (z-fighting offset + polygonOffset), userData.countryCode = cca3 (или null для unmatched)
   - [x] 2.6 Implement RaycastModule — pointer events (единый код mouse + touch) → raycasting → hover/click по country-мешам
   - [x] 2.7 Implement CountryStateModule + country selection. CountryDataMap (Map<cca3, {lat,lon}>) заполняется из restcountries. Оба пути (globe click и list click) используют один и тот же select(code) → CameraModule.flyTo с координатами из CountryDataMap.
-  - [x] 2.8 Verify: tsc ✓, eslint ✓, prettier ✓, tests (58/58) ✓, build ✓
+  - [x] 2.8 Verify: tsc ✓, eslint ✓, prettier ✓, tests ✓, build ✓
 
 - [x] Phase 3: UI & Data (Level 0 — mandatory)
   - [x] 3.1 Create React↔three-kvy-core bridge (GlobeCanvas component, event-based communication)
@@ -30,13 +30,13 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 3.3 Match REST Countries → GeoJSON по ISO codes: строим Map<ccn3, cca3> из данных restcountries, применяем при создании мешей. Обработка edge cases: страны без ccn3 (fallback по name), меши без match (серые, не кликабельные), записи restcountries без геометрии (присутствуют в данных, будут видны в списке при реализации Phase 4). Логируем unmatched.
   - [x] 3.4 Create CountryInfo panel — flag, name (common+official), capital, region, subregion, population, area, languages, currencies. Desktop: right side, mobile: bottom sheet. Animated show/hide.
   - [x] 3.5 Mobile responsive: info panel снизу на mobile (max-md:), touch controls (CameraModule + RaycastModule), backdrop-blur panel
-  - [x] 3.6 Verify: tsc ✓, eslint ✓, prettier ✓, tests (61/61) ✓, build ✓
+  - [x] 3.6 Verify: tsc ✓, eslint ✓, prettier ✓, tests ✓, build ✓
 
 - [x] Phase 4: Country List & Synchronization (Level 1 — recommended)
   - [x] 4.1 Create CountryList component with search by name (sorted alphabetically, flag + name per item)
   - [x] 4.2 Synchronize hover state: list item hover ↔ globe country highlight (via CountryStateModule events)
   - [x] 4.3 Synchronize select state: list click → globe fly-to, globe click → list scroll-to (scrollIntoView)
-  - [x] 4.4 Verify: tsc ✓, eslint ✓, prettier ✓, tests (68/68) ✓, build ✓, browser check ✓
+  - [x] 4.4 Verify: tsc ✓, eslint ✓, prettier ✓, tests ✓, build ✓, browser check ✓
 
 - [x] Phase 5: Table, Filtering & Virtualization (Level 2 — advanced)
   - [x] 5.1 Install @tanstack/react-table + @tanstack/react-virtual
@@ -45,12 +45,12 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
   - [x] 5.4 Add sorting by name, population, area, region columns
   - [x] 5.5 Implement virtualized scroll (@tanstack/react-virtual, overscan 10)
   - [x] 5.6 Synchronize table selection with globe (same as Level 1) + List/Table view toggle
-  - [x] 5.7 Verify: tsc ✓, eslint ✓, prettier ✓, tests (75/75) ✓, build ✓, browser check ✓
+  - [x] 5.7 Verify: tsc ✓, eslint ✓, prettier ✓, tests ✓, build ✓, browser check ✓
 
 - [x] Phase 6: Bonus — Creative 3D
   - [x] 6.1 Visual effects: hover/select color animation via tween.js (already from Phase 2)
-  - [x] 6.2 Globe appearance: atmosphere glow (Fresnel TSL shader on BackSide sphere), ocean TSL shader with polar color blend
-  - [x] 6.3 Light/dark theme toggle: ThemeToggle component, scene background/lighting changes, UI bg transition
+  - [x] 6.2 Globe appearance: atmosphere glow files exist (AtmosphereFeature + atmosphereShader) but NOT wired in createGlobeContext (disabled). Ocean TSL shader with polar color blend is active.
+  - [x] 6.3 Light/dark theme toggle: ThemeButton inline in App.tsx (not a separate ThemeToggle component). Theme changes scene.background in GlobeCanvas.tsx only (does NOT change lighting). UI bg transition works.
 
 - [ ] Phase 7: Polish & Deploy
   - [ ] 7.1 Mobile testing and fixes
@@ -78,7 +78,7 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 6 complete** — Level 0 + Level 1 done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel + CountryList with search and bidirectional sync. 76 tests passing. Ready for Phase 7 (Polish & Deploy).
+**Phase 6 complete** — Level 0 + Level 1 + Level 2 + Bonus done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel, CountryList with search, CountryTable with sort/filter/virtualization, bidirectional sync. 77 tests passing. Ready for Phase 7 (Polish & Deploy).
 
 ## Files
 - `task_plan.md` — this file

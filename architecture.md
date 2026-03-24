@@ -1,7 +1,7 @@
 # Architecture: Globe Explorer
 
 ## Overview
-A single-page React application with an embedded Three.js 3D globe scene. The 3D logic lives entirely in `three-kvy-core` classes (features/modules). React handles data fetching and state. Communication between React and 3D uses eventemitter3 events. UI panels (CountryInfo, list, table) are planned for Phase 3–5.
+A single-page React application with an embedded Three.js 3D globe scene. The 3D logic lives entirely in `three-kvy-core` classes (features/modules). React handles data fetching and state. Communication between React and 3D uses eventemitter3 events. UI panels (CountryInfo, CountryList, CountryTable) are fully implemented with bidirectional sync.
 
 ## WebGPU / Mobile Compatibility Strategy
 
@@ -51,28 +51,37 @@ globe-explorer/
 │   │   ├── features/
 │   │   │   ├── GlobeFeature.ts        # Object3DFeature — sphere mesh with ocean TSL shader
 │   │   │   ├── CountriesFeature.ts    # Object3DFeature — loads TopoJSON, creates country meshes
-│   │   │   └── CountryMeshFeature.ts  # Object3DFeature — per-country: hover/select visual state
+│   │   │   ├── CountryMeshFeature.ts  # Object3DFeature — per-country: hover/select visual state
+│   │   │   └── AtmosphereFeature.ts   # (exists but UNUSED — not wired in createGlobeContext)
 │   │   ├── shaders/
 │   │   │   ├── oceanShader.ts         # TSL: ocean surface shader
-│   │   │   └── countryShader.ts       # TSL: country mesh shader (base + hover + select states)
+│   │   │   ├── countryShader.ts       # TSL: country mesh shader (base + hover + select states)
+│   │   │   └── atmosphereShader.ts    # (exists but UNUSED — AtmosphereFeature not active)
 │   │   └── utils/
 │   │       ├── geoProjection.ts       # lon/lat → Vec3 on sphere, ring processing
 │   │       └── triangulate.ts         # Local-plane earcut + spherical subdivision
 │   │
 │   ├── components/
-│   │   └── GlobeCanvas.tsx        # Mounts CoreContext to a <div>, manages lifecycle
+│   │   ├── GlobeCanvas.tsx        # Mounts CoreContext to a <div>, manages lifecycle
+│   │   ├── CountryInfo.tsx        # Selected country details panel (flag, name, stats)
+│   │   ├── CountryList.tsx        # Scrollable country list with search + bidirectional sync
+│   │   ├── CountryTable.tsx       # @tanstack/react-table with sort/filter/virtualization
+│   │   ├── ViewCameraSync.tsx     # Syncs React view state with camera controls
+│   │   └── ThemeToggle.tsx        # (exists but UNUSED — ThemeButton is inline in App.tsx)
 │   │
 │   ├── hooks/
 │   │   ├── useCountries.ts        # react-query: fetch from restcountries.com (two batches)
 │   │   ├── useGlobeContext.ts     # React context + hook for accessing CoreContext
-│   │   └── useCountryState.ts     # Subscribe to CountryStateModule events from React
+│   │   ├── useCountryState.ts     # Subscribe to CountryStateModule events from React
+│   │   └── useTheme.ts            # Theme state hook (light/dark)
 │   │
 │   ├── types/
 │   │   └── country.ts            # TypeScript interfaces: Country, CountryDataEntry
 │   │
 │   ├── lib/
 │   │   ├── constants.ts          # Globe radius, API URLs, camera params
-│   │   └── cn.ts                 # clsx + tailwind-merge utility
+│   │   ├── cn.ts                 # clsx + tailwind-merge utility
+│   │   └── panelStyles.ts        # Shared panel styling utilities
 │   │
 │   └── test/
 │       └── setup.ts              # Vitest setup (@testing-library/jest-dom)
@@ -161,7 +170,7 @@ world-atlas TopoJSON → CountriesFeature → CountryMeshFeature[]
 User pointer events → RaycastModule → CountryStateModule → React + 3D Features
 ```
 
-### React → 3D direction (planned for Phase 3+):
+### React → 3D direction (currently working):
 1. User clicks country in list/table
 2. React calls `countryStateModule.select(code)`
 3. CountryStateModule emits "select" event
@@ -173,7 +182,7 @@ User pointer events → RaycastModule → CountryStateModule → React + 3D Feat
 2. RaycastModule detects hit, calls `countryStateModule.select(code)`
 3. CountryStateModule emits "select" event
 4. useCountryState hook updates React state
-5. (Phase 3: CountryInfo panel will re-render with new country)
+5. CountryInfo panel re-renders with selected country data
 
 ## Key Design Decisions
 - **All 3D logic in three-kvy-core**: Zero Three.js code in React components (ТЗ requirement)
