@@ -8,6 +8,7 @@ import {
 import {Object3DFeature} from '@vladkrutenyuk/three-kvy-core';
 import {GLOBE_RADIUS} from '../../lib/constants.ts';
 import {createOceanColorNode} from '../shaders/oceanShader.ts';
+import {sunDirection, updateSunDirection} from '../shaders/sunUniform.ts';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GlobeModules} from '../types.ts';
 
@@ -27,7 +28,7 @@ export class GlobeFeature extends Object3DFeature<GlobeModules> {
     // Lighting
     const ambientLight = new AmbientLight(0xffffff, 0.4);
     const dirLight = new DirectionalLight(0xffffff, 1.0);
-    dirLight.position.set(10, 10, 10);
+    dirLight.position.copy(sunDirection).multiplyScalar(20);
     const dirLight2 = new DirectionalLight(0xffffff, 0.3);
     dirLight2.position.set(-5, -3, -8);
 
@@ -35,7 +36,15 @@ export class GlobeFeature extends Object3DFeature<GlobeModules> {
     ctx.three.scene.add(dirLight);
     ctx.three.scene.add(dirLight2);
 
+    // Update sun direction + directional light each frame
+    const onBeforeRender = () => {
+      updateSunDirection();
+      dirLight.position.copy(sunDirection).multiplyScalar(20);
+    };
+    ctx.three.on('renderbefore', onBeforeRender);
+
     return () => {
+      ctx.three.off('renderbefore', onBeforeRender);
       this.object.remove(sphere);
       geometry.dispose();
       material.dispose();

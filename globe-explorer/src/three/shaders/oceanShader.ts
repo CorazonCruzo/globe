@@ -7,8 +7,8 @@ import {
   normalize,
   positionWorld,
   pow,
-  vec3,
 } from 'three/tsl';
+import {sunDirUniform} from './sunUniform.ts';
 
 const DEEP_COLOR = color(0x0a2a4a);
 const SHALLOW_COLOR = color(0x1a6a9a);
@@ -21,7 +21,7 @@ export function createOceanColorNode() {
   const normalDir = normalize(normalWorld);
   const ny = normalDir.y;
   const absNy = ny.abs();
-  const sunDir = normalize(vec3(10, 10, 10));
+  const sunDir = normalize(sunDirUniform);
   const viewDir = normalize(cameraPosition.sub(positionWorld));
   const sunFacing = normalDir.dot(sunDir);
   const sunLit = sunFacing.clamp(0, 1);
@@ -50,5 +50,5 @@ export function createOceanColorNode() {
   const twilightColor = mix(litColor, TWILIGHT_TINT, twilightBand);
   const finalColor = mix(twilightColor, GLINT_TINT, glint);
 
-  return vec3(finalColor);
+  return finalColor;
 }

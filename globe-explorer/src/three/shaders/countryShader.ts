@@ -1,13 +1,6 @@
 import {Color, FrontSide, MeshStandardNodeMaterial} from 'three/webgpu';
-import {
-  color,
-  float,
-  mix,
-  normalWorld,
-  normalize,
-  uniform,
-  vec3,
-} from 'three/tsl';
+import {color, float, mix, normalWorld, normalize, uniform} from 'three/tsl';
+import {sunDirUniform} from './sunUniform.ts';
 
 const DEFAULT_COLOR = new Color(0x3a9a5c);
 const HOVER_COLOR = new Color(0x6abf8a);
@@ -33,7 +26,7 @@ export function createCountryMaterial(matched: boolean) {
   const hoverMix = mix(baseColor, color(HOVER_COLOR), hoverFactor);
   const finalColor = mix(hoverMix, color(SELECT_COLOR), selectFactor);
   const normalDir = normalize(normalWorld);
-  const sunDir = normalize(vec3(10, 10, 10));
+  const sunDir = normalize(sunDirUniform);
   const sunFacing = normalDir.dot(sunDir);
   const sunLit = sunFacing.clamp(0, 1);
   const daylightLift = sunLit
