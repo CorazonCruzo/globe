@@ -4,7 +4,7 @@ Interactive 3D globe for exploring countries of the world. Built with React 19, 
 
 **[Live Demo](https://globe-lilac-xi.vercel.app/)**
 
-<video src="./demo/demo.mp4" autoplay loop muted playsinline width="100%"></video>
+![Globe Explorer Demo](./demo/demo.gif)
 
 ## Features
 
