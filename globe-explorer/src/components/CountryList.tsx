@@ -83,7 +83,7 @@ export function CountryList() {
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100dvh-2rem)] max-lg:max-h-[60dvh] w-64 flex-col rounded-xl border shadow-xl',
+        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100dvh-2rem)] w-64 flex-col rounded-xl border shadow-xl',
         panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode

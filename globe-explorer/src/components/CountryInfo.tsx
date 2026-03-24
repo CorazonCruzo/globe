@@ -1,6 +1,6 @@
+import {useEffect, useState} from 'react';
 import {useCountries} from '../hooks/useCountries.ts';
 import {useCountryState} from '../hooks/useCountryState.ts';
-import {useGlobeContext} from '../hooks/useGlobeContext.ts';
 import {useTheme} from '../hooks/useTheme.ts';
 import {cn} from '../lib/cn.ts';
 import {mutedClass, panelClass} from '../lib/panelStyles.ts';
@@ -103,11 +103,20 @@ export function CountryInfo() {
   const {selectedCode} = useCountryState();
   const {data: countries} = useCountries();
   const {theme} = useTheme();
-  const globe = useGlobeContext();
+  const [dismissed, setDismissed] = useState(false);
+
+  // Re-show panel when a different country is selected
+  useEffect(() => {
+    if (selectedCode) {
+      setDismissed(false);
+    }
+  }, [selectedCode]);
 
   const country = selectedCode
     ? countries?.find((c) => c.cca3 === selectedCode)
     : null;
+
+  const visible = country && !dismissed;
 
   return (
     <div
@@ -115,7 +124,7 @@ export function CountryInfo() {
         'pointer-events-auto absolute z-10 transition-all duration-300',
         'right-4 top-4 w-80',
         'max-md:inset-x-0 max-md:bottom-0 max-md:right-auto max-md:top-auto max-md:w-full',
-        country
+        visible
           ? 'translate-y-0 opacity-100'
           : 'pointer-events-none translate-y-2 opacity-0',
       )}
@@ -131,10 +140,11 @@ export function CountryInfo() {
           <button
             type="button"
             className={cn(
-              'absolute top-2 right-2 hidden rounded-full p-1 max-md:block',
+              'absolute top-2 right-2 rounded-full p-1',
               mutedClass(theme),
+              theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-800',
             )}
-            onClick={() => globe?.ctx.modules.countryState.select(null)}
+            onClick={() => setDismissed(true)}
           >
             <svg viewBox="0 0 16 16" fill="currentColor" className="h-4 w-4">
               <path d="M4.28 3.22a.75.75 0 0 0-1.06 1.06L6.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06L8 9.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L9.06 8l3.72-3.72a.75.75 0 0 0-1.06-1.06L8 6.94 4.28 3.22Z" />

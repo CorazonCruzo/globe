@@ -45,15 +45,25 @@ export function ViewCameraSync({view}: {view: 'list' | 'table'}) {
     const offset = getOffset(view);
     const hasOffset = offset.x !== 0 || offset.y !== 0;
 
-    // Table view: zoom out to fit
+    // Determine panel width that reduces available space
+    const isTablet = window.matchMedia(TABLET_QUERY).matches;
+    const isDesktop = window.matchMedia(DESKTOP_QUERY).matches;
+    let panelInset = 0;
+    if (view === 'table' && isDesktop) {
+      panelInset = TABLE_WIDTH_PX;
+    } else if (isTablet) {
+      panelInset = LIST_WIDTH_PX;
+    }
+
+    // Zoom out to fit in available space (excluding panel)
     let savedDistance: (() => void) | null = null;
-    if (view === 'table') {
-      savedDistance = camera.pushZoomToFit(true);
+    if (panelInset > 0) {
+      savedDistance = camera.pushZoomToFit(true, panelInset);
     }
 
     // Apply focal offset
     if (hasOffset) {
-      const fitDistance = camera.getComputedFitDistance();
+      const fitDistance = camera.getComputedFitDistance(panelInset);
       camera.setFocalOffsetPxAtDistance(offset.x, offset.y, fitDistance, true);
     }
 
@@ -61,8 +71,14 @@ export function ViewCameraSync({view}: {view: 'list' | 'table'}) {
     const onResize = () => {
       const newOffset = getOffset(view);
       const newHasOffset = newOffset.x !== 0 || newOffset.y !== 0;
+      const nowTablet = window.matchMedia(TABLET_QUERY).matches;
+      const nowDesktop = window.matchMedia(DESKTOP_QUERY).matches;
+      let newInset = 0;
+      if (view === 'table' && nowDesktop) newInset = TABLE_WIDTH_PX;
+      else if (nowTablet) newInset = LIST_WIDTH_PX;
+
       if (newHasOffset) {
-        const fitDist = camera.getComputedFitDistance();
+        const fitDist = camera.getComputedFitDistance(newInset);
         camera.setFocalOffsetPxAtDistance(
           newOffset.x,
           newOffset.y,

@@ -74,16 +74,12 @@ export class CameraModule extends CoreContextModule<
 
       // Safari trackpad: prevent default gesture events that interfere
       // with camera-controls wheel handling
-      container.addEventListener(
-        'gesturestart',
-        (e) => e.preventDefault(),
-        {passive: false},
-      );
-      container.addEventListener(
-        'gesturechange',
-        (e) => e.preventDefault(),
-        {passive: false},
-      );
+      container.addEventListener('gesturestart', (e) => e.preventDefault(), {
+        passive: false,
+      });
+      container.addEventListener('gesturechange', (e) => e.preventDefault(), {
+        passive: false,
+      });
 
       // Set initial distance
       controls.dollyTo(this.getFitDistance(camera, container), false);
@@ -147,12 +143,13 @@ export class CameraModule extends CoreContextModule<
   }
 
   /** Save current distance, zoom to fit, return restore function */
-  pushZoomToFit(animate = true): () => void {
+  pushZoomToFit(animate = true, insetLeft = 0): () => void {
     if (!this.controls || !this.container) return () => {};
     const saved = this.controls.distance;
     const fitDistance = this.getFitDistance(
       this.controls.camera,
       this.container,
+      insetLeft,
     );
     if (this.controls.distance < fitDistance) {
       this.controls.dollyTo(fitDistance, animate);
@@ -163,9 +160,9 @@ export class CameraModule extends CoreContextModule<
   }
 
   /** Public getter for fit distance */
-  getComputedFitDistance(): number {
+  getComputedFitDistance(insetLeft = 0): number {
     if (!this.controls || !this.container) return CAMERA_INITIAL_DISTANCE;
-    return this.getFitDistance(this.controls.camera, this.container);
+    return this.getFitDistance(this.controls.camera, this.container, insetLeft);
   }
 
   /** Set focal offset in pixel units (converted to world units at given distance) */
@@ -210,12 +207,13 @@ export class CameraModule extends CoreContextModule<
   private getFitDistance(
     camera: THREE.Camera,
     container: HTMLDivElement,
+    insetLeft = 0,
   ): number {
     if (!(camera instanceof THREE.PerspectiveCamera)) {
       return CAMERA_INITIAL_DISTANCE;
     }
     return getFitDistanceForViewport(
-      container.clientWidth,
+      container.clientWidth - insetLeft,
       container.clientHeight,
       camera.fov,
     );
