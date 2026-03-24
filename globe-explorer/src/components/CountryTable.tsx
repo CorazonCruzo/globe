@@ -189,8 +189,8 @@ export function CountryTable() {
         'max-lg:w-64',
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
-          ? 'max-h-[calc(100dvh-2rem)] max-md:hidden'
-          : 'max-h-[calc(100dvh-2rem)] max-md:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-md:max-h-60',
+          ? 'max-h-[calc(100dvh-2rem)] max-lg:max-h-[60dvh] max-md:hidden'
+          : 'max-h-[calc(100dvh-2rem)] max-lg:max-h-[60dvh] max-md:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-md:max-h-60',
         'max-md:transition-all max-md:duration-300',
       )}
     >

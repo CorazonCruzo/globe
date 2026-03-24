@@ -41,6 +41,14 @@ export class RaycastModule extends CoreContextModule<
         pointerMoved = true;
       }
 
+      // Skip hover on touch devices — only hover with mouse
+      if (e.pointerType !== 'mouse') {
+        if (pointerMoved) {
+          ctx.modules.countryState.hover(null);
+        }
+        return;
+      }
+
       updatePointer(e);
       this.raycaster.setFromCamera(this.pointer, ctx.three.camera);
       const hits = this.raycaster.intersectObjects(this.targets, false);

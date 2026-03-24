@@ -72,6 +72,19 @@ export class CameraModule extends CoreContextModule<
       // Disable truck (panning)
       controls.truckSpeed = 0;
 
+      // Safari trackpad: prevent default gesture events that interfere
+      // with camera-controls wheel handling
+      container.addEventListener(
+        'gesturestart',
+        (e) => e.preventDefault(),
+        {passive: false},
+      );
+      container.addEventListener(
+        'gesturechange',
+        (e) => e.preventDefault(),
+        {passive: false},
+      );
+
       // Set initial distance
       controls.dollyTo(this.getFitDistance(camera, container), false);
     };
