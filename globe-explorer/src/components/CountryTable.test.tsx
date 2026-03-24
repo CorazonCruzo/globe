@@ -1,7 +1,18 @@
 import {describe, expect, it, vi} from 'vitest';
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {CountryTable} from './CountryTable.tsx';
+
+/** Helper: open the base-ui Select popup and click an option by name */
+async function selectRegion(
+  user: ReturnType<typeof userEvent.setup>,
+  name: string,
+) {
+  const trigger = screen.getByRole('combobox');
+  await user.click(trigger);
+  const option = screen.getByRole('option', {name});
+  await user.click(option);
+}
 
 const mockCountries = [
   {
@@ -91,10 +102,9 @@ describe('CountryTable', () => {
 
   it('filters by region', async () => {
     const user = userEvent.setup();
-    const {getByRole, getByText, queryByText} = render(<CountryTable />);
+    const {getByText, queryByText} = render(<CountryTable />);
 
-    const select = getByRole('combobox');
-    await user.selectOptions(select, 'Asia');
+    await selectRegion(user, 'Asia');
 
     expect(getByText('Japan')).toBeInTheDocument();
     expect(queryByText('France')).not.toBeInTheDocument();
@@ -124,12 +134,10 @@ describe('CountryTable', () => {
     });
 
     const user = userEvent.setup();
-    const {getByRole, rerender, getByText, queryByText} = render(
-      <CountryTable />,
-    );
+    const {rerender, getByText, queryByText} = render(<CountryTable />);
 
     // Filter to Asia only
-    await user.selectOptions(getByRole('combobox'), 'Asia');
+    await selectRegion(user, 'Asia');
     expect(getByText('Japan')).toBeInTheDocument();
     expect(queryByText('Brazil')).not.toBeInTheDocument();
 
@@ -140,8 +148,8 @@ describe('CountryTable', () => {
     });
     rerender(<CountryTable />);
 
-    // Region filter should be cleared, Brazil visible
-    expect(getByRole('combobox')).toHaveValue('');
+    // Region filter should be cleared, trigger shows "All regions"
+    expect(screen.getByRole('combobox')).toHaveTextContent('All regions');
     expect(getByText('Brazil')).toBeInTheDocument();
   });
 
@@ -178,17 +186,17 @@ describe('CountryTable', () => {
     } as unknown as ReturnType<typeof useGlobeContext>);
 
     const user = userEvent.setup();
-    const {getByRole, getByText} = render(<CountryTable />);
+    const {getByText} = render(<CountryTable />);
 
     // Filter to Asia
-    await user.selectOptions(getByRole('combobox'), 'Asia');
+    await selectRegion(user, 'Asia');
     expect(getByText('Japan')).toBeInTheDocument();
 
     // Click Japan in the table (internal click)
     await user.click(getByText('Japan'));
     expect(selectFn).toHaveBeenCalledWith('JPN');
 
-    // Region filter should NOT be cleared
-    expect(getByRole('combobox')).toHaveValue('Asia');
+    // Region filter should NOT be cleared — trigger still shows "Asia"
+    expect(screen.getByRole('combobox')).toHaveTextContent('Asia');
   });
 });

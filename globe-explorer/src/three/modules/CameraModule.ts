@@ -1,5 +1,5 @@
 import CameraControls from 'camera-controls';
-import * as THREE from 'three';
+import * as THREE from 'three/webgpu';
 import {CoreContextModule} from '@vladkrutenyuk/three-kvy-core';
 import {
   CAMERA_INITIAL_DISTANCE,

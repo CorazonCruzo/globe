@@ -1,5 +1,4 @@
-import {Color, FrontSide} from 'three';
-import {MeshStandardNodeMaterial} from 'three/webgpu';
+import {Color, FrontSide, MeshStandardNodeMaterial} from 'three/webgpu';
 import {
   color,
   float,

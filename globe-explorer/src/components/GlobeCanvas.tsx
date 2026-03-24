@@ -1,22 +1,19 @@
 import {useEffect, useRef, useState} from 'react';
-import {Color} from 'three';
 import {GlobeContext} from '../hooks/useGlobeContext.ts';
 import {cn} from '../lib/cn.ts';
 import {
   createGlobeContext,
   loadCountryData,
+  setSceneTheme,
 } from '../three/createGlobeContext.ts';
 import type {GlobeContextResult} from '../three/createGlobeContext.ts';
 import type {Country} from '../types/country.ts';
 import type {Theme} from '../hooks/useTheme.ts';
 
-const SCENE_BG = {
-  dark: new Color(0x0f172a),
-  light: new Color(0x1a2744),
-};
-
 interface GlobeCanvasProps {
   countries?: Array<Country>;
+  /** Error from country data fetch (react-query) */
+  countriesError?: Error | null;
   theme?: Theme;
   /** CSS translateX for the 3D canvas, e.g. "30%" to shift globe right */
   canvasOffsetX?: string;
@@ -27,6 +24,7 @@ interface GlobeCanvasProps {
 
 export function GlobeCanvas({
   countries,
+  countriesError,
   theme = 'dark',
   canvasOffsetX,
   canvasOffsetY,
@@ -88,10 +86,17 @@ export function GlobeCanvas({
     }
   }, [result, countries]);
 
+  // Surface API fetch error
+  useEffect(() => {
+    if (countriesError) {
+      setError(countriesError.message);
+    }
+  }, [countriesError]);
+
   // Update scene background on theme change
   useEffect(() => {
     if (!result) return;
-    result.ctx.three.scene.background = SCENE_BG[theme];
+    setSceneTheme(result.ctx, theme);
   }, [result, theme]);
 
   const loading = !error && (!rendererReady || !countriesReady);
@@ -104,7 +109,7 @@ export function GlobeCanvas({
       <div
         ref={containerRef}
         className={cn(
-          'h-full w-full origin-center transition-transform duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+          'h-full w-full touch-none origin-center transition-transform duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
           canvasOffsetX
             ? 'md:translate-x-[var(--canvas-offset-x)] md:scale-[0.65]'
             : '',
@@ -126,9 +131,7 @@ export function GlobeCanvas({
       )}
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-900 text-white">
-          <p className="text-lg font-semibold">
-            Failed to initialize 3D renderer
-          </p>
+          <p className="text-lg font-semibold">Something went wrong</p>
           <p className="text-sm text-slate-400">{error}</p>
         </div>
       )}

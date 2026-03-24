@@ -1,4 +1,4 @@
-import {Color, Mesh, SphereGeometry} from 'three';
+import {Color, Mesh, SphereGeometry} from 'three/webgpu';
 import {Object3DFeature} from '@vladkrutenyuk/three-kvy-core';
 import {GLOBE_RADIUS} from '../../lib/constants.ts';
 import {createRimGlowMaterial} from '../shaders/atmosphereShader.ts';

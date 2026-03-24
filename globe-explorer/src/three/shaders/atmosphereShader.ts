@@ -1,5 +1,4 @@
-import {AdditiveBlending, BackSide} from 'three';
-import {MeshBasicNodeMaterial} from 'three/webgpu';
+import {AdditiveBlending, BackSide, MeshBasicNodeMaterial} from 'three/webgpu';
 import {
   cameraPosition,
   float,
@@ -9,7 +8,7 @@ import {
   uniform,
   vec4,
 } from 'three/tsl';
-import type {Color} from 'three';
+import type {Color} from 'three/webgpu';
 
 /**
  * Thin rim glow — a sharp Fresnel on a slightly larger BackSide sphere.

@@ -49,14 +49,14 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 
 - [x] Phase 6: Bonus — Creative 3D
   - [x] 6.1 Visual effects: hover/select color animation via tween.js (already from Phase 2)
-  - [x] 6.2 Globe appearance: atmosphere glow files exist (AtmosphereFeature + atmosphereShader) but NOT wired in createGlobeContext (disabled). Ocean TSL shader with polar color blend is active.
-  - [x] 6.3 Light/dark theme toggle: ThemeButton inline in App.tsx (not a separate ThemeToggle component). Theme changes scene.background in GlobeCanvas.tsx only (does NOT change lighting). UI bg transition works.
+  - [x] 6.2 Globe appearance: AtmosphereFeature (Fresnel rim glow) + StarfieldFeature (900 procedural stars) active in createGlobeContext. Ocean TSL shader with polar/day/twilight color blend.
+  - [x] 6.3 Light/dark theme toggle: ThemeButton inline in App.tsx. Theme changes scene.background via setSceneTheme() in 3D layer (does NOT change lighting). UI bg transition works via CSS.
 
-- [ ] Phase 7: Polish & Deploy
-  - [ ] 7.1 Mobile testing and fixes
-  - [ ] 7.2 Performance audit (bundle size, render performance)
+- [x] Phase 7: Polish & Deploy
+  - [x] 7.1 Mobile testing and fixes (dvh, touch-action:none, viewport-fit:cover, safe-area padding, larger touch targets)
+  - [x] 7.2 Performance audit (vendor chunk splitting: three/react/base-ui/tanstack/geo)
   - [ ] 7.3 Deploy to GitHub Pages
-  - [ ] 7.4 Final review against ТЗ checklist
+  - [x] 7.4 Final review against ТЗ checklist (base-ui Select+Tabs integrated, Three.js removed from React layer, unused ThemeToggle deleted)
 
 ## Blocked / Open Questions
 - [ ] Confirm @base-ui/react is the correct "base-ui" from ТЗ (assumption based on research)
@@ -71,14 +71,14 @@ Build a React + Three.js web application — interactive 3D globe for exploring 
 - **web-configs**: @shopify/prettier-config (assumption based on research)
 - **WebGPU fallback**: Полагаемся на встроенный автоматический fallback WebGPURenderer → WebGL2. TSL код портируемый. wgslFn() не используем.
 - **Координаты для flyTo**: Единственный источник — restcountries.com поле `latlng`. Хранятся в CountryDataMap внутри CountryStateModule. Оба пути (globe click, list click) проходят через select(code) → CameraModule.flyTo с данными из этой Map.
-- **ISO matching**: Мост numeric→cca3 строится из данных restcountries (поле ccn3), fallback по name (case-insensitive) для стран без ccn3. Unmatched меши — серые/не кликабельные. Unmatched записи restcountries — присутствуют в данных, будут видны в UI при реализации Phase 4. Логируем.
+- **ISO matching**: Мост numeric→cca3 строится из данных restcountries (поле ccn3), fallback по name (case-insensitive) для стран без ccn3. Unmatched меши — серые/не кликабельные. Unmatched записи restcountries — присутствуют в данных, видны в списке и таблице (нет highlight на глобусе). Логируем.
 - **Триангуляция**: earcut в локальной 2D-плоскости (не lon/lat) + spherical subdivision после earcut. Антимеридиан и полюса обрабатываются автоматически без special-case split.
 - **Z-fighting**: polygonOffset вместо depthTest:false. Стандартный depth test включён, FrontSide culling.
 - **Z-fighting**: Country меши на R+0.01, океан на R. polygonOffset для дополнительной защиты.
 - **Антимеридиан**: Обрабатывается автоматически через локальную 2D-проекцию при триангуляции (не нужен runtime split).
 
 ## Status
-**Phase 6 complete** — Level 0 + Level 1 + Level 2 + Bonus done. Globe with WebGPURenderer, country meshes, camera-controls, raycasting, CountryStateModule. CountryInfo panel, CountryList with search, CountryTable with sort/filter/virtualization, bidirectional sync. 77 tests passing. Ready for Phase 7 (Polish & Deploy).
+**Phase 7 complete** (except deploy) — All levels + Bonus + Polish done. Mobile support (dvh, touch-action, safe-area), vendor chunk splitting, base-ui integration (Select, Tabs), zero Three.js in React layer. 85 tests passing.
 
 ## Files
 - `task_plan.md` — this file

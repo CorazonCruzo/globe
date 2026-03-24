@@ -16,6 +16,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
+import {Select} from '@base-ui/react/select';
 import {useCountries} from '../hooks/useCountries.ts';
 import {useCountryState} from '../hooks/useCountryState.ts';
 import {useGlobeContext} from '../hooks/useGlobeContext.ts';
@@ -187,8 +188,8 @@ export function CountryTable() {
         panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
         selectedCode
-          ? 'max-h-[calc(100vh-2rem)] max-md:hidden'
-          : 'max-h-[calc(100vh-2rem)] max-md:bottom-4 max-md:max-h-60',
+          ? 'max-h-[calc(100dvh-2rem)] max-md:hidden'
+          : 'max-h-[calc(100dvh-2rem)] max-md:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-md:max-h-60',
         'max-md:transition-all max-md:duration-300',
       )}
     >
@@ -233,26 +234,58 @@ export function CountryTable() {
             </button>
           )}
         </div>
-        <select
-          value={regionFilter}
-          onChange={(e) => setRegionFilter(e.target.value)}
-          className={cn(
-            'appearance-none rounded-lg py-1 pl-3 pr-7 text-sm outline-none focus:ring-1',
-            'bg-[length:16px_16px] bg-[position:right_6px_center] bg-no-repeat',
-            inputClass(theme),
-          )}
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239ca3af'%3E%3Cpath d='M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z'/%3E%3C/svg%3E\")",
-          }}
+        <Select.Root
+          value={regionFilter || null}
+          onValueChange={(value) => setRegionFilter(value ?? '')}
         >
-          <option value="">All regions</option>
-          {REGIONS.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
+          <Select.Trigger
+            className={cn(
+              'flex items-center gap-1 rounded-lg py-1 pl-3 pr-2 text-sm outline-none focus:ring-1',
+              inputClass(theme),
+            )}
+          >
+            <Select.Value placeholder="All regions" />
+            <Select.Icon className={mutedClass(theme)}>
+              <svg viewBox="0 0 16 16" fill="currentColor" className="h-4 w-4">
+                <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" />
+              </svg>
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Positioner side="bottom" align="end" sideOffset={4}>
+              <Select.Popup
+                className={cn(
+                  'z-50 rounded-lg border py-1 shadow-xl',
+                  panelClass(theme),
+                )}
+              >
+                <Select.Item
+                  value={null}
+                  className={cn(
+                    'flex cursor-pointer items-center px-3 py-1.5 text-sm outline-none',
+                    'data-highlighted:bg-slate-600/40 data-highlighted:text-white',
+                    theme === 'dark' ? 'text-slate-300' : 'text-slate-200',
+                  )}
+                >
+                  <Select.ItemText>All regions</Select.ItemText>
+                </Select.Item>
+                {REGIONS.map((r) => (
+                  <Select.Item
+                    key={r}
+                    value={r}
+                    className={cn(
+                      'flex cursor-pointer items-center px-3 py-1.5 text-sm outline-none',
+                      'data-highlighted:bg-slate-600/40 data-highlighted:text-white',
+                      theme === 'dark' ? 'text-slate-300' : 'text-slate-200',
+                    )}
+                  >
+                    <Select.ItemText>{r}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
       </div>
 
       <div className="overflow-x-auto overscroll-x-contain">

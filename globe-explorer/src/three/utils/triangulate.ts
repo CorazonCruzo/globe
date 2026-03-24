@@ -3,7 +3,7 @@ import {
   BufferGeometry,
   Float32BufferAttribute,
   Uint32BufferAttribute,
-} from 'three';
+} from 'three/webgpu';
 import {lonLatToVec3} from './geoProjection.ts';
 
 interface Vec2 {

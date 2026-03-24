@@ -4,7 +4,7 @@ import {
   Float32BufferAttribute,
   Points,
   PointsMaterial,
-} from 'three';
+} from 'three/webgpu';
 import {Object3DFeature} from '@vladkrutenyuk/three-kvy-core';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GlobeModules} from '../types.ts';

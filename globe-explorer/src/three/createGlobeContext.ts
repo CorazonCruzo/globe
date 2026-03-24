@@ -1,5 +1,11 @@
-import {Clock, Group, PerspectiveCamera, Scene} from 'three';
-import {WebGPURenderer} from 'three/webgpu';
+import {
+  Clock,
+  Color,
+  Group,
+  PerspectiveCamera,
+  Scene,
+  WebGPURenderer,
+} from 'three/webgpu';
 import {CoreContext, addFeature} from '@vladkrutenyuk/three-kvy-core';
 import {CAMERA_INITIAL_DISTANCE} from '../lib/constants.ts';
 import {CameraModule} from './modules/CameraModule.ts';
@@ -18,6 +24,19 @@ import type {GlobeModules} from './types.ts';
 import type {Country} from '../types/country.ts';
 
 export type {GlobeModules} from './types.ts';
+
+const SCENE_BG = {
+  dark: new Color(0x0f172a),
+  light: new Color(0x1a2744),
+};
+
+/** Set scene background based on UI theme. Keeps Three.js Color logic in 3D layer. */
+export function setSceneTheme(
+  ctx: CoreContext<GlobeModules>,
+  theme: 'dark' | 'light',
+) {
+  ctx.three.scene.background = SCENE_BG[theme];
+}
 
 export interface GlobeContextResult {
   ctx: CoreContext<GlobeModules>;

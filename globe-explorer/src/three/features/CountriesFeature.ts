@@ -7,7 +7,7 @@ import {
   LineSegments,
   Mesh,
   Vector3,
-} from 'three';
+} from 'three/webgpu';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {Object3DFeature, addFeature} from '@vladkrutenyuk/three-kvy-core';
 import {feature, mesh as topoMesh} from 'topojson-client';

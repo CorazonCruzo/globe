@@ -125,7 +125,7 @@ export function CountryInfo() {
           className={cn(
             'relative rounded-xl border px-3 py-2.5 shadow-xl',
             panelClass(theme),
-            'max-md:rounded-b-none max-md:rounded-t-xl',
+            'max-md:rounded-b-none max-md:rounded-t-xl max-md:pb-[calc(0.625rem+env(safe-area-inset-bottom))]',
           )}
         >
           <button

@@ -1,4 +1,4 @@
-import {Vector3} from 'three';
+import {Vector3} from 'three/webgpu';
 import {DEG2RAD, SUBDIVISION_MAX_ANGLE_DEG} from '../../lib/constants.ts';
 
 /**

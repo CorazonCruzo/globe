@@ -1,5 +1,10 @@
-import {AmbientLight, DirectionalLight, Mesh, SphereGeometry} from 'three';
-import {MeshStandardNodeMaterial} from 'three/webgpu';
+import {
+  AmbientLight,
+  DirectionalLight,
+  Mesh,
+  MeshStandardNodeMaterial,
+  SphereGeometry,
+} from 'three/webgpu';
 import {Object3DFeature} from '@vladkrutenyuk/three-kvy-core';
 import {GLOBE_RADIUS} from '../../lib/constants.ts';
 import {createOceanColorNode} from '../shaders/oceanShader.ts';

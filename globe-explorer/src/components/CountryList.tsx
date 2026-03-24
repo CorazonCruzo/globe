@@ -83,10 +83,12 @@ export function CountryList() {
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100vh-2rem)] w-64 flex-col rounded-xl border shadow-xl',
+        'pointer-events-auto absolute top-4 left-4 z-10 flex max-h-[calc(100dvh-2rem)] w-64 flex-col rounded-xl border shadow-xl',
         panelClass(theme),
         'max-md:inset-x-0 max-md:top-auto max-md:left-0 max-md:mx-2 max-md:w-auto max-md:rounded-xl',
-        selectedCode ? 'max-md:hidden' : 'max-md:bottom-4 max-md:max-h-60',
+        selectedCode
+          ? 'max-md:hidden'
+          : 'max-md:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-md:max-h-60',
         'max-md:transition-all max-md:duration-300',
       )}
     >
@@ -175,7 +177,7 @@ const CountryListItem = memo(
         ref={ref}
         type="button"
         className={cn(
-          'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors',
+          'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors max-md:py-2.5',
           listItemClass(theme, isSelected, isHovered),
         )}
         onClick={() => onSelect(country.cca3)}

@@ -37,8 +37,8 @@ globe-explorer/
 ├── package.json
 ├── src/
 │   ├── main.tsx               # React entry point
-│   ├── App.tsx                # Root layout: QueryClientProvider + GlobeCanvas
-│   ├── index.css              # Tailwind CSS v4 entry (@import "tailwindcss")
+│   ├── App.tsx                # Root layout: QueryClientProvider + lazy GlobeCanvas + Suspense
+│   ├── index.css              # Tailwind CSS v4 entry (@import "tailwindcss"), 100dvh root
 │   │
 │   ├── three/                 # All Three.js logic via three-kvy-core
 │   │   ├── createGlobeContext.ts  # Factory: CoreContext + WebGPURenderer + camera + scene + modules
@@ -52,22 +52,22 @@ globe-explorer/
 │   │   │   ├── GlobeFeature.ts        # Object3DFeature — sphere mesh with ocean TSL shader
 │   │   │   ├── CountriesFeature.ts    # Object3DFeature — loads TopoJSON, creates country meshes
 │   │   │   ├── CountryMeshFeature.ts  # Object3DFeature — per-country: hover/select visual state
-│   │   │   └── AtmosphereFeature.ts   # (exists but UNUSED — not wired in createGlobeContext)
+│   │   │   ├── AtmosphereFeature.ts   # Object3DFeature — Fresnel rim glow on slightly larger sphere
+│   │   │   └── StarfieldFeature.ts    # Object3DFeature — 900 procedural stars, follows camera
 │   │   ├── shaders/
-│   │   │   ├── oceanShader.ts         # TSL: ocean surface shader
+│   │   │   ├── oceanShader.ts         # TSL: ocean surface shader (day/twilight/glint)
 │   │   │   ├── countryShader.ts       # TSL: country mesh shader (base + hover + select states)
-│   │   │   └── atmosphereShader.ts    # (exists but UNUSED — AtmosphereFeature not active)
+│   │   │   └── atmosphereShader.ts    # TSL: Fresnel-based rim glow for AtmosphereFeature
 │   │   └── utils/
 │   │       ├── geoProjection.ts       # lon/lat → Vec3 on sphere, ring processing
 │   │       └── triangulate.ts         # Local-plane earcut + spherical subdivision
 │   │
 │   ├── components/
-│   │   ├── GlobeCanvas.tsx        # Mounts CoreContext to a <div>, manages lifecycle
+│   │   ├── GlobeCanvas.tsx        # Mounts CoreContext, lazy-loaded via React.lazy()
 │   │   ├── CountryInfo.tsx        # Selected country details panel (flag, name, stats)
 │   │   ├── CountryList.tsx        # Scrollable country list with search + bidirectional sync
 │   │   ├── CountryTable.tsx       # @tanstack/react-table with sort/filter/virtualization
-│   │   ├── ViewCameraSync.tsx     # Syncs React view state with camera controls
-│   │   └── ThemeToggle.tsx        # (exists but UNUSED — ThemeButton is inline in App.tsx)
+│   │   └── ViewCameraSync.tsx     # Syncs React view state with camera controls
 │   │
 │   ├── hooks/
 │   │   ├── useCountries.ts        # react-query: fetch from restcountries.com (two batches)
@@ -91,9 +91,10 @@ globe-explorer/
 
 ### three/createGlobeContext.ts
 - Purpose: Factory function that creates and configures the entire 3D scene
-- Creates: WebGPURenderer, PerspectiveCamera, Scene, Clock
+- Creates: WebGPURenderer (from `three/webgpu`), PerspectiveCamera, Scene, Clock
 - Registers modules: CameraModule, TweenModule, RaycastModule, CountryStateModule
-- Creates globe Object3D with GlobeFeature + CountriesFeature attached
+- Creates globe Object3D with StarfieldFeature + GlobeFeature + AtmosphereFeature + CountriesFeature attached
+- Exports `setSceneTheme(ctx, theme)` — sets scene.background Color based on light/dark theme
 - Returns: CoreContext instance + CountriesFeature ref
 
 ### three/modules/CameraModule.ts (CoreContextModule)

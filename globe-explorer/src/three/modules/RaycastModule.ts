@@ -1,6 +1,6 @@
-import {Raycaster, Vector2} from 'three';
+import {Raycaster, Vector2} from 'three/webgpu';
 import {CoreContextModule} from '@vladkrutenyuk/three-kvy-core';
-import type {Mesh, Object3D} from 'three';
+import type {Mesh, Object3D} from 'three/webgpu';
 import type {CoreContext} from '@vladkrutenyuk/three-kvy-core';
 import type {GlobeModules} from '../types.ts';
 

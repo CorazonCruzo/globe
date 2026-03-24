@@ -17,7 +17,7 @@
 - **Country shaders** (`countryShader.ts`) — MeshStandardNodeMaterial with polygonOffset for z-fighting, uniform-driven hover/select color blend (green → light green on hover, → gold on select)
 
 ### React Bridge (Phase 2/3)
-- **GlobeCanvas** component — mounts CoreContext, shows loading state during WebGPU init, provides GlobeContext to children
+- **GlobeCanvas** component — lazy-loaded via `React.lazy()`, mounts CoreContext, shows loading/error state during WebGPU init and API fetch, provides GlobeContext to children
 - **useCountries** hook — @tanstack/react-query fetch from restcountries.com (all required fields)
 - **useCountryState** hook — subscribes to CountryStateModule events, exposes selectedCode/hoveredCode
 - **useGlobeContext** hook — React context for accessing CoreContext and CountriesFeature
@@ -47,9 +47,19 @@
 - **View toggle**: List/Table switch button at bottom center
 
 ### Bonus (Phase 6)
-- **Atmosphere glow** — `AtmosphereFeature` and `atmosphereShader.ts` files exist but are **disabled** (not wired in `createGlobeContext`). The Fresnel-based TSL shader for edge glow is implemented but inactive.
+- **Atmosphere glow** — `AtmosphereFeature` active in `createGlobeContext`. Slightly larger BackSide sphere (R*1.004) with Fresnel-based TSL rim glow shader (`atmosphereShader.ts`). Additive blending, no depth write.
+- **Starfield** — `StarfieldFeature` active in `createGlobeContext`. 900 procedural stars via seeded RNG, PointsMaterial with vertex colors, follows camera position so stars are always visible in background.
 - **Hover/select animations** — tween.js color transitions in CountryMeshFeature (green → light green on hover, → gold on select)
-- **Ocean TSL shader** — depth/latitude-based color blend (deep → shallow → pole colors)
-- **Light/dark theme toggle** — ThemeButton inline in `App.tsx` (not a separate ThemeToggle component). Theme changes `scene.background` in `GlobeCanvas.tsx` only (does NOT change lighting). UI background transition works via CSS.
+- **Ocean TSL shader** — depth/latitude/sun-facing color blend (deep → shallow → pole colors, day/twilight tinting, specular glint)
+- **Light/dark theme toggle** — ThemeButton inline in `App.tsx`. Theme changes `scene.background` via `setSceneTheme()` in 3D layer (does NOT change lighting). UI background transition works via CSS.
+
+### Polish (Phase 7)
+- **Mobile support**: `viewport-fit=cover` meta, `touch-action: none` on 3D canvas, `100dvh` instead of `100vh`, `env(safe-area-inset-top)` on mobile top controls (ViewToggle, ThemeButton), `env(safe-area-inset-bottom)` on mobile bottom panels (CountryInfo, CountryList, CountryTable). Larger touch targets on mobile (list items, tabs, theme button).
+- **Error handling**: API fetch errors from restcountries surfaced in GlobeCanvas error state (no more infinite "Loading countries..." on API failure).
+- **Lazy loading**: GlobeCanvas loaded via `React.lazy()` with `Suspense` fallback.
+- **Performance**: Vendor chunk splitting via function-based `manualChunks` — separate chunks for three.js, react, base-ui, tanstack, and geo data for better caching.
+- **base-ui integration**: `@base-ui/react/select` for region filter dropdown in CountryTable, `@base-ui/react/tabs` for List/Table view toggle.
+- **Architecture compliance**: Zero Three.js imports in React layer — `setSceneTheme()` utility in 3D layer handles theme→Color mapping.
+- **Cleanup**: Removed unused ThemeToggle.tsx component, updated HTML title to "Globe Explorer".
 
 ## Not Yet Implemented

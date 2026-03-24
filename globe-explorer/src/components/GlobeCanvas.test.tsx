@@ -6,11 +6,13 @@ import {GlobeCanvas} from './GlobeCanvas.tsx';
 const mocks = vi.hoisted(() => ({
   createGlobeContext: vi.fn(() => new Promise(() => {})),
   loadCountryData: vi.fn(),
+  setSceneTheme: vi.fn(),
 }));
 
 vi.mock('../three/createGlobeContext.ts', () => ({
   createGlobeContext: mocks.createGlobeContext,
   loadCountryData: mocks.loadCountryData,
+  setSceneTheme: mocks.setSceneTheme,
 }));
 
 describe('GlobeCanvas', () => {
