@@ -2,7 +2,7 @@
 
 Interactive 3D globe for exploring countries of the world. Built with React 19, Three.js r183 (WebGPURenderer), and three-kvy-core.
 
-**[Live Demo](https://globe-lilac-xi.vercel.app/)**
+**[Live Demo](https://globe.chestnykh.net)**
 
 ![Globe Explorer Demo](./demo/demo.gif)
 
