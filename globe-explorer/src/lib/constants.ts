@@ -13,8 +13,8 @@ export const CAMERA_MAX_POLAR = Math.PI - 0.05;
 
 export const SUBDIVISION_MAX_ANGLE_DEG = 5;
 
-// restcountries.com limits ?fields to 10 per request, so we split into two
-export const REST_COUNTRIES_API_1 =
-  'https://restcountries.com/v3.1/all?fields=name,cca3,ccn3,capital,population,area,region,subregion,latlng,flags';
-export const REST_COUNTRIES_API_2 =
-  'https://restcountries.com/v3.1/all?fields=name,cca3,languages,currencies';
+export const COUNTRIES_API_URL =
+  'https://countries.dev/countries?fields=name,alpha3Code,numericCode,capital,population,area,region,subregion,latlng,flags,languages,currencies';
+
+export const COUNTRIES_FALLBACK_URL =
+  'https://cdn.jsdelivr.net/gh/restcountries/restcountries@bfadee4f951682c29970e53677707bc558e80b74/src/main/resources/countriesV3.1.json';

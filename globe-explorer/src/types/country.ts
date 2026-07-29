@@ -7,7 +7,7 @@ export interface Country {
   ccn3?: string;
   capital?: Array<string>;
   population: number;
-  area: number;
+  area?: number;
   region: string;
   subregion?: string;
   languages?: Record<string, string>;
@@ -17,7 +17,7 @@ export interface Country {
     svg: string;
     alt?: string;
   };
-  latlng: [number, number];
+  latlng?: [number, number];
 }
 
 export interface CountryDataEntry {

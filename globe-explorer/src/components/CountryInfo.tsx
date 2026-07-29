@@ -62,9 +62,11 @@ function CountryDetails({
           <h2 className="text-lg font-semibold leading-tight">
             {country.name.common}
           </h2>
-          <p className={cn('text-xs', mutedClass(theme))}>
-            {country.name.official}
-          </p>
+          {country.name.official !== country.name.common && (
+            <p className={cn('text-xs', mutedClass(theme))}>
+              {country.name.official}
+            </p>
+          )}
         </div>
       </div>
 
@@ -89,7 +91,9 @@ function CountryDetails({
         />
         <DetailRow
           label="Area"
-          value={formatArea(country.area)}
+          value={
+            country.area === undefined ? '\u2014' : formatArea(country.area)
+          }
           theme={theme}
         />
         <DetailRow label="Languages" value={languages} theme={theme} />

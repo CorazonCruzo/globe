@@ -98,7 +98,7 @@ export async function createGlobeContext(
 
 /**
  * Load country data into the globe context.
- * Called from React after restcountries data is fetched.
+ * Called from React after country metadata is fetched.
  */
 export function loadCountryData(
   result: GlobeContextResult,
@@ -109,10 +109,12 @@ export function loadCountryData(
 
   // Store lat/lon/area in CountryDataMap
   for (const c of countries) {
+    if (!c.latlng) continue;
+
     countryState.countryData.set(c.cca3, {
       lat: c.latlng[0],
       lon: c.latlng[1],
-      area: c.area,
+      area: c.area ?? 0,
     });
   }
 

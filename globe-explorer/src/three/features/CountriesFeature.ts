@@ -41,7 +41,7 @@ const BORDER_COLOR = new Color(0x294c61);
 const BORDER_OPACITY = 0.82;
 
 /**
- * Build a Map<numericISO, cca3> from restcountries data.
+ * Build a Map<numericISO, cca3> from normalized country metadata.
  * For countries without ccn3, attempts fallback matching by name.
  */
 export function buildIsoMap(

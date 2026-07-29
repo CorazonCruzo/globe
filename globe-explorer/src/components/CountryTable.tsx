@@ -40,8 +40,8 @@ function formatPopulation(n: number): string {
   return String(n);
 }
 
-function formatArea(n: number): string {
-  return n.toLocaleString('en-US');
+function formatArea(n: number | undefined): string {
+  return n === undefined ? '\u2014' : n.toLocaleString('en-US');
 }
 
 const columns: Array<ColumnDef<Country, unknown>> = [

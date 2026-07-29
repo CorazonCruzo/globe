@@ -17,7 +17,7 @@ export class CountryStateModule extends CoreContextModule<
   private _selectedCode: string | null = null;
   private _hoveredCode: string | null = null;
 
-  /** Map<cca3, {lat, lon}> — filled from restcountries data */
+  /** Map<cca3, {lat, lon}> — filled from normalized country metadata */
   readonly countryData = new Map<string, CountryDataEntry>();
 
   get selectedCode() {
